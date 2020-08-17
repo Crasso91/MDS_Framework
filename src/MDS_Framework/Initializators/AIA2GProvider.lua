@@ -8,27 +8,29 @@ function AIA2GProvider:Init()
   local dispatchers = Configuration.Dispatchers
   
   for coalitionId, coalition in pairs(dispatchers) do
-    for nationId, nation in pairs(coalition) do
-      if nation.Active and nation.DispatcherType == Dispatcher.AG then  
-        local prefix = coalitionId .. "_" .. nationId .. "_"
-        local dispatcherOptions = AIA2GProvider:InitA2GDispatcherOptions(prefix,nation)
-        
-        local MissionsOptions = {} 
-        for unitId, unit in pairs(nation.Units) do
-          local option = AIA2GProvider:InitSquadronOption(coalitionId, nationId, unitId, unit)
+    if coalition.Active then
+      for nationId, nation in pairs(coalition) do
+        if nation.Active and nation.DispatcherType == Dispatcher.AG then  
+          local prefix = coalitionId .. "_" .. nationId .. "_"
+          local dispatcherOptions = AIA2GProvider:InitA2GDispatcherOptions(prefix,nation)
           
-          if option ~= nil then
-            option:SetTakeoffMode(unit.TakeoffMode)
-              :SetLandMode(unit.LandMode)
-              :SetTakeoffIntervall(unit.TakeoffIntervall)
-              
-            table.insert(MissionsOptions, option)
+          local MissionsOptions = {} 
+          for unitId, unit in pairs(nation.Units) do
+            local option = AIA2GProvider:InitSquadronOption(coalitionId, nationId, unitId, unit)
+            
+            if option ~= nil then
+              option:SetTakeoffMode(unit.TakeoffMode)
+                :SetLandMode(unit.LandMode)
+                :SetTakeoffIntervall(unit.TakeoffIntervall)
+                
+              table.insert(MissionsOptions, option)
+            end
           end
+          
+          local A2GDispatcherInitializator = A2GDispatcherInitializator:New(dispatcherOptions)
+            :SetSquadronsOptions(MissionsOptions)
+            :Init()
         end
-        
-        local A2GDispatcherInitializator = A2GDispatcherInitializator:New(dispatcherOptions)
-          :SetSquadronsOptions(MissionsOptions)
-          :Init()
       end
     end
   end

@@ -6,7 +6,7 @@ Configuration = {
     TakeoffMode = TakeoffMode.Hot,
     LandMode = LandMode.Runway,
 	Flags = {
-		Dispatchers {
+		Dispatchers = {
 			Blue_Active = true,
 			Red_Active = false,
 			USA_Active = true,

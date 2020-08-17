@@ -17,7 +17,7 @@ LandMode = {
   NearAirbase = "NearAirbase"
 }
 
-Rectivity = {
+Reactivity = {
   High = "High",
   Medium = "Medium",
   Low = "Low"
@@ -33,5 +33,12 @@ Mission = {
   CAS = "CAS",
   BAI = "BAI",
   SEAD = "SEAD"
+}
+
+Dispatcher = {
+  AG = "AG",
+  AA = "AA",
+  Task = "Task",
+  Ground = "Ground"
 }
 

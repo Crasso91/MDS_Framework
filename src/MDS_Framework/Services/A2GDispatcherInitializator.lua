@@ -1,7 +1,7 @@
 A2GDispatcherInitializator = {
   ClassName = "A2GDispatcherInitializator",
   DispatcherOptions = nil,
-  Options = nil,
+  Options = nil
 }
 
 function A2GDispatcherInitializator:New(_options) 
@@ -23,11 +23,11 @@ function A2GDispatcherInitializator:Init()
     A2GDispatcher:AddDefenseCoordinate( defencePoint.ZoneName, defencePoint:GetPointVec2() )
   end
   
-  if  self.DispatcherOptions.Reactivity == Rectivity.High then
+  if  self.DispatcherOptions.Reactivity == Reactivity.High then
     A2GDispatcher:SetDefenseReactivityHigh()
-  elseif self.DispatcherOptions.Reactivity == Rectivity.Medium then
+  elseif self.DispatcherOptions.Reactivity == Reactivity.Medium then
     A2GDispatcher:SetDefenseReactivityMedium()
-  elseif self.DispatcherOptions.Reactivity == Rectivity.Low then
+  elseif self.DispatcherOptions.Reactivity == Reactivity.Low then
     A2GDispatcher:SetDefenseReactivityLow()
   else 
     A2GDispatcher:SetDefenseReactivityMedium() 
@@ -46,7 +46,7 @@ function A2GDispatcherInitializator:SetSquadrons(_A2GDispatcher)
   for i,option in ipairs(self.Options) do
     if option.AirbaseResourceMode == AirbaseResourceMode.EveryAirbase then
         for i,airbase in ipairs(option.Airbases) do
-          local SquadronName = option.Mission .. "_" .. count
+          local SquadronName = airbase.AirbaseName .. "_" .. count
           _A2GDispatcher:SetSquadron( SquadronName, airbase.AirbaseName, option.Groups, option.ResourceCount )
           self:SetSquadronMission(SquadronName, option, _A2GDispatcher)
           self:SetSquadronTakeoff(SquadronName, option, _A2GDispatcher)
@@ -56,8 +56,9 @@ function A2GDispatcherInitializator:SetSquadrons(_A2GDispatcher)
           count = count + 1
         end
     else
-      local SquadronName = option.Mission .. "_" .. count
-      _A2GDispatcher:SetSquadron( SquadronName, option:GetRandomAirbase().AirbaseName, option.Groups, option.ResourceCount )
+      local airbaseName = option:GetRandomAirbase().AirbaseName
+      local SquadronName = airbaseName .. "_" .. count
+      _A2GDispatcher:SetSquadron( SquadronName, airbaseName, option.Groups, option.ResourceCount )
       self:SetSquadronMission(SquadronName, option, _A2GDispatcher)
       self:SetSquadronTakeoff(SquadronName, option, _A2GDispatcher)
       self:SetSquadronLand(SquadronName, option, _A2GDispatcher)
@@ -69,15 +70,17 @@ function A2GDispatcherInitializator:SetSquadrons(_A2GDispatcher)
 end
 
 function A2GDispatcherInitializator:SetSquadronMission(_squadronName, _option, _A2GDispatcher)
-  if _option.Mission == Mission.BAI then
-    _A2GDispatcher:SetSquadronBai( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2], _option.AttackAltitude[1], _option.AttackAltitude[2])
-  elseif _option.Mission == Mission.CAS then
-    _A2GDispatcher:SetSquadronCas( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2], _option.AttackAltitude[1], _option.AttackAltitude[2])
-  elseif _option.Mission == Mission.SEAD then
-    _A2GDispatcher:SetSquadronSead( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2], _option.AttackAltitude[1], _option.AttackAltitude[2])
-  else 
-    _A2GDispatcher:SetSquadronCas( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2], _option.AttackAltitude[1], _option.AttackAltitude[2])
-  end
+--  for i , mission in ipairs(_option.Missions) do
+    if _option.Missions == Mission.BAI then
+      _A2GDispatcher:SetSquadronBai( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2], _option.AttackAltitude[1], _option.AttackAltitude[2])
+    elseif _option.Missions == Mission.CAS then
+      _A2GDispatcher:SetSquadronCas( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2], _option.AttackAltitude[1], _option.AttackAltitude[2])
+    elseif _option.Missions == Mission.SEAD then
+      _A2GDispatcher:SetSquadronSead( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2], _option.AttackAltitude[1], _option.AttackAltitude[2])
+    else 
+--      _A2GDispatcher:SetSquadronCas( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2], _option.AttackAltitude[1], _option.AttackAltitude[2])
+    end
+--  end
 end
 
 function A2GDispatcherInitializator:SetSquadronTakeoff(_squadronName, _option, _A2GDispatcher)

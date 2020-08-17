@@ -1,3 +1,4 @@
+rem Remove rem from row 2 to update repo before compiling
 rem git pull origin --verbose
 
 IF NOT EXIST Compiled (

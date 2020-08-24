@@ -1,127 +1,91 @@
-A2ADispatcherInitializator = {
-  ClassName = "A2ADispatcherInitializator",
-  DispatcherOptions = nil,
-  Options = nil,
-  AssignedCap = {}
+A2ADispatcherOptions = {
+  ClassName = "A2ADispatcherOptions",
+  __index = A2ADispatcherOptions,
+  EngageRadius = nil,
+  InterceptDelay = nil,
+  TacticalDisplay = true,
+  DetectionGroups = {},
+  CAPZones = {},
+  AssignedCAPS = {}
 }
 
-function A2ADispatcherInitializator:New(_options) 
-  self.DispatcherOptions = _options
+function A2ADispatcherOptions:New()
+  local self = BASE:Inherit( self, BASE:New() )
   return self
 end
 
-function A2ADispatcherInitializator:SetSquadronsOptions(_options)
-  self.Options = _options
+--function A2ADispatcherOptions:SetCommandCenter(_commandCenterName)
+--  self.CommandCenter = GROUP:FindByName(_commandCenterName)
+--  return self
+--end
+
+--function A2ADispatcherOptions:SetDetectionArea(_DetectionArea)  
+--  self.DetectionArea = _DetectionArea
+--  return self
+--end
+
+function A2ADispatcherOptions:SetEngageRadius(_EngageRadius)  
+  self.EngageRadius = _EngageRadius
   return self
 end
 
-function A2ADispatcherInitializator:Init() 
+--function A2ADispatcherOptions:SetReactivity(_reactivity)
+--  self.Reactivity = _reactivity
+--  return self
+--end
 
-  local Detection = DETECTION_AREAS:New( self.DispatcherOptions.DetectionGroups, self.DispatcherOptions.EngageRadius )
-  local A2ADispatcher = AI_A2A_DISPATCHER:New( Detection )
-  
-  if self.DispatcherOptions.InterceptDelay ~= nil then
-    A2ADispatcher:SetIntercept(self.DispatcherOptions.InterceptDelay)
-  end
-  
-  if self.DispatcherOptions.EngageRadius ~= nil then
-    A2ADispatcher:SetEngageRadius(self.DispatcherOptions.EngageRadius)
-  end
-  
---  for id, defencePoint in pairs(self.DispatcherOptions.DefenceCoordinates) do
---    A2ADispatcher:AddDefenseCoordinate( defencePoint.ZoneName, defencePoint:GetPointVec2() )
---  end
-  
---  if  self.DispatcherOptions.Reactivity == Reactivity.High then
---    A2ADispatcher:SetDefenseReactivityHigh()
---  elseif self.DispatcherOptions.Reactivity == Reactivity.Medium then
---    A2ADispatcher:SetDefenseReactivityMedium()
---  elseif self.DispatcherOptions.Reactivity == Reactivity.Low then
---    A2ADispatcher:SetDefenseReactivityLow()
---  else 
---    A2ADispatcher:SetDefenseReactivityMedium() 
---  end
-  
---  A2ADispatcher:SetDefenseRadius( self.DispatcherOptions.DefenseRadious )
---  A2ADispatcher:SetCommandCenter( self.DispatcherOptions.CommandCenter )
-  A2ADispatcher:SetTacticalDisplay( self.DispatcherOptions.TacticalDisplay )
-  self:SetSquadrons(A2ADispatcher)
+function A2ADispatcherOptions:SetTacticalDisplay(_tacticalDisplay)
+  self.TacticalDisplay = _tacticalDisplay
   return self
-  
 end
 
-function A2ADispatcherInitializator:SetSquadrons(_A2ADispatcher)
-  local count = 1
-  for i,option in ipairs(self.Options) do
-    local  availableCap = self.DispatcherOptions:GetAvailableCap()
-    if option.AirbaseResourceMode == AirbaseResourceMode.EveryAirbase and availableCap ~= nil then
-        for i,airbase in ipairs(option.Airbases) do
-          local SquadronName = airbase.AirbaseName .. "_" .. count
-          
-          _A2ADispatcher:SetSquadron( SquadronName, airbase.AirbaseName, option.Groups, option.ResourceCount )
-          self:SetSquadronMission(SquadronName, availableCap, option, _A2ADispatcher)
-          self:SetSquadronTakeoff(SquadronName, option, _A2ADispatcher)
-          self:SetSquadronLand(SquadronName, option, _A2ADispatcher)
-          _A2ADispatcher:SetSquadronOverhead( SquadronName, option.OverHead )
-          _A2ADispatcher:SetSquadronTakeoffInterval( SquadronName, option.TakeoffIntervall )
-          count = count + 1
-        end
-    elseif availableCap ~= nil then
-      local airbaseName = option:GetRandomAirbase().AirbaseName
-      local SquadronName = airbaseName .. "_" .. count
-      _A2ADispatcher:SetSquadron( SquadronName, airbaseName, option.Groups, option.ResourceCount )
-      self:SetSquadronMission(SquadronName, availableCap, option, _A2ADispatcher)
-      self:SetSquadronTakeoff(SquadronName, option, _A2ADispatcher)
-      self:SetSquadronLand(SquadronName, option, _A2ADispatcher)
-      _A2ADispatcher:SetSquadronOverhead( SquadronName, option.OverHead )
---      _A2ADispatcher:SetSquadronTakeoffInterval( SquadronName, option.TakeoffIntervall )
-      count = count + 1
-    end
-  end 
+function A2ADispatcherOptions:SetInterceptDelay(_InterceptDelay)
+  self.InterceptDelay = _InterceptDelay
+  return self
 end
 
-function A2ADispatcherInitializator:SetSquadronMission(_squadronName, _CAPZone, _option, _A2ADispatcher)
---  for i , mission in ipairs(_option.Missions) do
-    if _option.Missions == Mission.CAP then
-      local CAPZone = ZONE_POLYGON:New( "CAP" .. _squadronName, _CAPZone)
-      _A2ADispatcher:SetSquadronCap( _squadronName, CAPZone, _option.AttackAltitude[1], _option.AttackAltitude[2], _option.AttackSpeed[1], _option.AttackSpeed[2])
-      _A2ADispatcher:SetSquadronCapInterval(_squadronName, _option.CapLimit, _option.LowInterval, _option.HighInterval, _option.Probability)
-      _A2ADispatcher:SetSquadronGrouping( _squadronName, _option.CapGroupCount )
-      _A2ADispatcher:SetSquadronGci( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2])
-      _A2ADispatcher:SetSquadronFuelThreshold(_squadronName, _option.FuelThreshold)
-    elseif _option.Missions == Mission.Gci then
-      _A2ADispatcher:SetSquadronGci( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2])--, _option.AttackAltitude[1], _option.AttackAltitude[2])
-    elseif _option.Missions == Mission.SEAD then
-      _A2ADispatcher:SetSquadronSead( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2], _option.AttackAltitude[1], _option.AttackAltitude[2])
-    else 
---      _A2ADispatcher:SetSquadronCas( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2], _option.AttackAltitude[1], _option.AttackAltitude[2])
-    end
---  end
-end
-
-function A2ADispatcherInitializator:SetSquadronTakeoff(_squadronName, _option, _A2ADispatcher)
-  if _option.TakeoffMode == TakeoffMode.Air then
-    _A2ADispatcher:SetDefaultTakeoffInAir(_squadronName)
-  elseif _option.TakeoffMode == TakeoffMode.Cold then
-    _A2ADispatcher:SetDefaultTakeoffFromParkingCold(_squadronName)
-  elseif _option.TakeoffMode == TakeoffMode.Hot then
-    _A2ADispatcher:SetDefaultTakeoffFromParkingHot(_squadronName)
-  elseif _option.TakeoffMode == TakeoffMode.Runway then
-    _A2ADispatcher:SetDefaultTakeoffFromRunway(_squadronName) 
+function A2ADispatcherOptions:SetDetectionGroups(_Groups, _arePrefix)
+  if _arePrefix then
+    self.DetectionGroups = SET_GROUP:New()
+      :FilterPrefixes(_Groups)
+      :FilterStart()
   else
-    _A2ADispatcher:SetDefaultTakeoffFromParkingCold(_squadronName)
-  end
+    local foundedGroups = {}
+    for groupId, groupName in ipairs(_Groups) do
+      --table.insert(foundedGroups, GROUP:FindByName(group))
+      local group = GROUP:FindByName(group)
+      foundedGroups[groupName] = group
+    end
+    self.DetectionGroups = foundedGroups
+  end 
+  return self
 end
 
+function A2ADispatcherOptions:SetCAPZones(_Groups, _arePrefix)
+  if _arePrefix then
+    self.CAPZones = SET_GROUP:New()
+      :FilterPrefixes(_Groups)
+      :FilterStart()
+      .Set
+  else
+    local foundedGroups = {}
+    for id, group in ipairs(_Groups) do
+      foundedGroups[_Groups] = GROUP:FindByName(_Groups)
+    end
+    self.DefenceCoordinates = foundedGroups
+  end 
+  return self
+end
 
-function A2ADispatcherInitializator:SetSquadronLand(_squadronName, _option, _A2ADispatcher)
-  if _option.LandMode == LandMode.NearAirbase then
-    _A2ADispatcher:SetSquadronLandingNearAirbase(_squadronName)
-  elseif _option.LandMode == LandMode.Runway then
-    _A2ADispatcher:SetSquadronLandingAtRunway(_squadronName)
-  elseif _option.LandMode == LandMode.Shutdown then
-    _A2ADispatcher:SetSquadronLandingAtEngineShutdown(_squadronName)
-  else 
-    _A2ADispatcher:SetSquadronLandingAtEngineShutdown(_squadronName)
+function A2ADispatcherOptions:GetAvailableCap()
+  local foundCap = nil
+    
+  for i,capZone in pairs(self.CAPZones) do
+    if self.AssignedCAPS[capZone.GroupName] == nil then
+      self.AssignedCAPS[capZone.GroupName] = true
+      foundCap = capZone
+      break
+    end
   end
+  return foundCap
 end

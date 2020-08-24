@@ -11,7 +11,13 @@ SquadronsOptions = {
   Airbases = {},
   ResourceCount = 5,
   AirbaseResourceMode = AirbaseResourceMode.EveryAirbase,
-  Missions = { Mission.CAP }
+  Missions = { Mission.CAP },
+  CapLimit = 2,
+  LowInterval = 30,
+  HighInterval = 600,
+  Probability = 1,
+  FuelThreshold = 2.5,
+  CapGroupCount = 1
 }
 
 function SquadronsOptions:New()
@@ -35,7 +41,7 @@ function SquadronsOptions:SetOverhead(_OverHead)
 end
 
 function SquadronsOptions:SetTakeoffMode(_Takeoff)
-  self.Takeoff = _Takeoff
+  self.TakeoffMode = _Takeoff
   return self
 end
 
@@ -66,6 +72,36 @@ end
 
 function SquadronsOptions:SetResourceCount(_ResourceCount)
   self.ResourceCount = _ResourceCount
+  return self
+end
+
+function SquadronsOptions:SetCapLimit(_CapLimit)
+  self.CapLimit = _CapLimit
+  return self
+end
+
+function SquadronsOptions:SetLowInterval(_LowInterval)
+  self.LowInterval = _LowInterval
+  return self
+end
+
+function SquadronsOptions:SetHighInterval(_HighInterval)
+  self.HighInterval = _HighInterval
+  return self
+end
+
+function SquadronsOptions:SetProbability(_Probability)
+  self.Probability = _Probability
+  return self
+end
+
+function SquadronsOptions:SetFuelThreshold(_FuelThreshold)
+  self.FuelThreshold = _FuelThreshold
+  return self
+end
+
+function SquadronsOptions:SetCapGroupCount(_CapGroupCount)
+  self.CapGroupCount = _CapGroupCount
   return self
 end
 

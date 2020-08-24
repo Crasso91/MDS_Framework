@@ -32,13 +32,15 @@ Mission = {
   CAP = "CAP",
   CAS = "CAS",
   BAI = "BAI",
-  SEAD = "SEAD"
+  SEAD = "SEAD",
+  GCI = "GCI"
 }
 
 Dispatcher = {
   AG = "AG",
   AA = "AA",
   Task = "Task",
-  Ground = "Ground"
+  Ground = "Ground",
+  GCI = "GCI"
 }
 

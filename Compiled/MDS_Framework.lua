@@ -32,14 +32,16 @@ Mission = {
   CAP = "CAP",
   CAS = "CAS",
   BAI = "BAI",
-  SEAD = "SEAD"
+  SEAD = "SEAD",
+  GCI = "GCI"
 }
 
 Dispatcher = {
   AG = "AG",
   AA = "AA",
   Task = "Task",
-  Ground = "Ground"
+  Ground = "Ground",
+  GCI = "GCI"
 }
 
 Configuration = {
@@ -49,24 +51,38 @@ Configuration = {
     Era = 1990,
     TakeoffMode = TakeoffMode.Hot,
     LandMode = LandMode.Runway,
-    A2GDispatcherBlue_Active = true,
-    A2GDispatcherRed_Active = false    
+  Flags = {
+    TacticalDiplay = true, 
+    Dispatchers = {
+      Blue_Active = true,
+      Blue_USA_Active = true,
+      Blue_USA_AG_Active = true,
+      Blue_USA_AG_A10_BAI_Active = true,
+      Blue_USA_AG_AH64D_BAI_Active = true,
+      
+      Red_Active = true,
+      Red_Russia_Active = true,
+      Red_Russia_GCI_Active = false,
+      Red_Russia_AA_Active = true,
+      Red_Russia_AA_SU27_CAP_Active = true
+    }
+  }
   }
 }
 
 Configuration.Dispatchers = {
     ["Blue"] = {
-      ["USA"] = {
+    ["USA"] = {
+     [1] = {
         CommandCenter = "HQ",
         DetectionArea = 10000,
         DefenseRadious = 50000,
         Reactivity = Reactivity.High,
-        TacticalDisplay = true,
+        TacticalDisplay = Configuration.Settings.Flags.TacticalDiplay,
         DispatcherType = Dispatcher.AG,
         TakeoffMode = Configuration.Settings.TakeoffMode,
         TakeoffInterval = 20,
         LandMode = Configuration.Settings.LandMode, 
-        Active = Configuration.Settings.A2GDispatcherBlue_Active,
         DetectionGroups = { 
           { Name = "Detection", isPrefix = true }
         },
@@ -85,13 +101,12 @@ Configuration.Dispatchers = {
                 Overhead = 0.25,
                 AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
                 ResourceCount = 4,
-                Active = true
               },
               [Mission.CAS] = {},
               [Mission.SEAD] = {}
             }
           },
-          ["Apache"] = {
+          ["AH64D"] = {
             Airbases = { 
               { Name = "BAI_CAS_", isPrefix = true }  
             },
@@ -102,7 +117,6 @@ Configuration.Dispatchers = {
                 Overhead = 0.50,
                 AirbaseResourceMode = AirbaseResourceMode.EveryAirbase,
                 ResourceCount = 4,
-                Active = true
               },
               [Mission.CAS] = {},
               [Mission.SEAD] = {}
@@ -111,7 +125,48 @@ Configuration.Dispatchers = {
         }
       }
     }
+  },
+  ["Red"] = {
+    ["Russia"] = {
+      [1] = {
+        DispatcherType = Dispatcher.AA,
+        Active = Configuration.Settings.Flags.Russia_AA_Active,
+        DetectionGroups = {{ Name = "EWR", isPrefix = true }},
+        CAPZones = {{ Name = "CAP", isPrefix = true }}, 
+        --SimultaneousMaxCAP = 2,
+        TakeoffMode = Configuration.Settings.TakeoffMode,
+        TakeoffInterval = 20,
+        LandMode = Configuration.Settings.LandMode, 
+        --EnemyGroupingRadiuos = 6000,
+        EngageRadius = 80000,
+        InterceptDelay = 450,
+        --GciRadious = 10
+        TacticalDisplay = Configuration.Settings.Flags.TacticalDiplay,
+        Units = { 
+          ["Su-27"] = {
+            Airbases = { 
+              { Name = "CAP_Airbase", isPrefix = true }  
+            },
+            Missions = {
+              [Mission.CAP] = {
+                AttackAltitude = { 10000 , 20000 },
+                AttackSpeed = { 800, 1200 },
+                Overhead = 0.25,
+                AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
+                ResourceCount = 4,
+                CapLimit = 2,
+                LowInterval = 30,
+                HighInterval = 600,
+                Probability = 1,
+                FuelThreshold = 2.5,
+              }
+            }
+          }
+        }
+      }
+    }
   }
+}
 
 A2GDispatcherOptions = {
   ClassName = "A2GDispatcherOptions",
@@ -188,6 +243,98 @@ function A2GDispatcherOptions:SetDefenceCoordinates(_triggers, _arePrefix)
   end 
   return self
 end
+A2ADispatcherOptions = {
+  ClassName = "A2ADispatcherOptions",
+  __index = A2ADispatcherOptions,
+  EngageRadius = nil,
+  InterceptDelay = nil,
+  TacticalDisplay = true,
+  DetectionGroups = {},
+  CAPZones = {},
+  AssignedCAPS = {}
+}
+
+function A2ADispatcherOptions:New()
+  local self = BASE:Inherit( self, BASE:New() )
+  return self
+end
+
+--function A2ADispatcherOptions:SetCommandCenter(_commandCenterName)
+--  self.CommandCenter = GROUP:FindByName(_commandCenterName)
+--  return self
+--end
+
+--function A2ADispatcherOptions:SetDetectionArea(_DetectionArea)  
+--  self.DetectionArea = _DetectionArea
+--  return self
+--end
+
+function A2ADispatcherOptions:SetEngageRadius(_EngageRadius)  
+  self.EngageRadius = _EngageRadius
+  return self
+end
+
+--function A2ADispatcherOptions:SetReactivity(_reactivity)
+--  self.Reactivity = _reactivity
+--  return self
+--end
+
+function A2ADispatcherOptions:SetTacticalDisplay(_tacticalDisplay)
+  self.TacticalDisplay = _tacticalDisplay
+  return self
+end
+
+function A2ADispatcherOptions:SetInterceptDelay(_InterceptDelay)
+  self.InterceptDelay = _InterceptDelay
+  return self
+end
+
+function A2ADispatcherOptions:SetDetectionGroups(_Groups, _arePrefix)
+  if _arePrefix then
+    self.DetectionGroups = SET_GROUP:New()
+      :FilterPrefixes(_Groups)
+      :FilterStart()
+  else
+    local foundedGroups = {}
+    for groupId, groupName in ipairs(_Groups) do
+      --table.insert(foundedGroups, GROUP:FindByName(group))
+      local group = GROUP:FindByName(group)
+      foundedGroups[groupName] = group
+    end
+    self.DetectionGroups = foundedGroups
+  end 
+  return self
+end
+
+function A2ADispatcherOptions:SetCAPZones(_Groups, _arePrefix)
+  if _arePrefix then
+    self.CAPZones = SET_GROUP:New()
+      :FilterPrefixes(_Groups)
+      :FilterStart()
+      .Set
+  else
+    local foundedGroups = {}
+    for id, group in ipairs(_Groups) do
+      foundedGroups[_Groups] = GROUP:FindByName(_Groups)
+    end
+    self.DefenceCoordinates = foundedGroups
+  end 
+  return self
+end
+
+function A2ADispatcherOptions:GetAvailableCap()
+  local foundCap = nil
+    
+  for i,capZone in pairs(self.CAPZones) do
+    if self.AssignedCAPS[capZone.GroupName] == nil then
+      self.AssignedCAPS[capZone.GroupName] = true
+      foundCap = capZone
+      break
+    end
+  end
+  return foundCap
+end
+
 SquadronsOptions = {
   ClassName = "SquadronsOptions",
   AttackAltitude = { 300, 400 },
@@ -201,7 +348,12 @@ SquadronsOptions = {
   Airbases = {},
   ResourceCount = 5,
   AirbaseResourceMode = AirbaseResourceMode.EveryAirbase,
-  Missions = { Mission.CAP }
+  Missions = { Mission.CAP },
+  CapLimit = 2,
+  LowInterval = 30,
+  HighInterval = 600,
+  Probability = 1,
+  FuelThreshold = 2.5
 }
 
 function SquadronsOptions:New()
@@ -225,7 +377,7 @@ function SquadronsOptions:SetOverhead(_OverHead)
 end
 
 function SquadronsOptions:SetTakeoffMode(_Takeoff)
-  self.Takeoff = _Takeoff
+  self.TakeoffMode = _Takeoff
   return self
 end
 
@@ -256,6 +408,31 @@ end
 
 function SquadronsOptions:SetResourceCount(_ResourceCount)
   self.ResourceCount = _ResourceCount
+  return self
+end
+
+function SquadronsOptions:SetCapLimit(_CapLimit)
+  self.CapLimit = _CapLimit
+  return self
+end
+
+function SquadronsOptions:SetLowInterval(_LowInterval)
+  self.LowInterval = _LowInterval
+  return self
+end
+
+function SquadronsOptions:SetHighInterval(_HighInterval)
+  self.HighInterval = _HighInterval
+  return self
+end
+
+function SquadronsOptions:SetProbability(_Probability)
+  self.Probability = _Probability
+  return self
+end
+
+function SquadronsOptions:SetFuelThreshold(_FuelThreshold)
+  self.FuelThreshold = _FuelThreshold
   return self
 end
 
@@ -456,7 +633,134 @@ function A2GDispatcherInitializator:SetSquadronLand(_squadronName, _option, _A2G
     _A2GDispatcher:SetSquadronLandingAtEngineShutdown(_squadronName)
   end
 end
--- Service per la gestione delle zone predefinite nella mappa attraverso i Trigger
+
+A2ADispatcherInitializator = {
+  ClassName = "A2ADispatcherInitializator",
+  DispatcherOptions = nil,
+  Options = nil,
+  AssignedCap = {}
+}
+
+function A2ADispatcherInitializator:New(_options) 
+  self.DispatcherOptions = _options
+  return self
+end
+
+function A2ADispatcherInitializator:SetSquadronsOptions(_options)
+  self.Options = _options
+  return self
+end
+
+function A2ADispatcherInitializator:Init() 
+
+  local Detection = DETECTION_AREAS:New( self.DispatcherOptions.DetectionGroups, self.DispatcherOptions.DetectionArea )
+  local A2ADispatcher = AI_A2A_DISPATCHER:New( Detection )
+  
+  if self.DispatcherOptions.InterceptDelay ~= nil then
+    A2ADispatcher:SetIntercept(self.DispatcherOptions.InterceptDelay)
+  end
+  
+  if self.DispatcherOptions.EngageRadius ~= nil then
+    A2ADispatcher:SetEngageRadius(self.DispatcherOptions.EngageRadius)
+  end
+  
+--  for id, defencePoint in pairs(self.DispatcherOptions.DefenceCoordinates) do
+--    A2ADispatcher:AddDefenseCoordinate( defencePoint.ZoneName, defencePoint:GetPointVec2() )
+--  end
+  
+--  if  self.DispatcherOptions.Reactivity == Reactivity.High then
+--    A2ADispatcher:SetDefenseReactivityHigh()
+--  elseif self.DispatcherOptions.Reactivity == Reactivity.Medium then
+--    A2ADispatcher:SetDefenseReactivityMedium()
+--  elseif self.DispatcherOptions.Reactivity == Reactivity.Low then
+--    A2ADispatcher:SetDefenseReactivityLow()
+--  else 
+--    A2ADispatcher:SetDefenseReactivityMedium() 
+--  end
+  
+--  A2ADispatcher:SetDefenseRadius( self.DispatcherOptions.DefenseRadious )
+--  A2ADispatcher:SetCommandCenter( self.DispatcherOptions.CommandCenter )
+  A2ADispatcher:SetTacticalDisplay( self.DispatcherOptions.TacticalDisplay )
+  self:SetSquadrons(A2ADispatcher)
+  return self
+  
+end
+
+function A2ADispatcherInitializator:SetSquadrons(_A2ADispatcher)
+  local count = 1
+  for i,option in ipairs(self.Options) do
+    local  availableCap = self.DispatcherOptions:GetAvailableCap()
+    if option.AirbaseResourceMode == AirbaseResourceMode.EveryAirbase and availableCap ~= nil then
+        for i,airbase in ipairs(option.Airbases) do
+          local SquadronName = airbase.AirbaseName .. "_" .. count
+          
+          _A2ADispatcher:SetSquadron( SquadronName, airbase.AirbaseName, option.Groups, option.ResourceCount )
+          self:SetSquadronMission(SquadronName, availableCap, option, _A2ADispatcher)
+          self:SetSquadronTakeoff(SquadronName, option, _A2ADispatcher)
+          self:SetSquadronLand(SquadronName, option, _A2ADispatcher)
+          _A2ADispatcher:SetSquadronOverhead( SquadronName, option.OverHead )
+          _A2ADispatcher:SetSquadronTakeoffInterval( SquadronName, option.TakeoffIntervall )
+          count = count + 1
+        end
+    elseif availableCap ~= nil then
+      local airbaseName = option:GetRandomAirbase().AirbaseName
+      local SquadronName = airbaseName .. "_" .. count
+      _A2ADispatcher:SetSquadron( SquadronName, airbaseName, option.Groups, option.ResourceCount )
+      self:SetSquadronMission(SquadronName, availableCap, option, _A2ADispatcher)
+      self:SetSquadronTakeoff(SquadronName, option, _A2ADispatcher)
+      self:SetSquadronLand(SquadronName, option, _A2ADispatcher)
+      _A2ADispatcher:SetSquadronOverhead( SquadronName, option.OverHead )
+--      _A2ADispatcher:SetSquadronTakeoffInterval( SquadronName, option.TakeoffIntervall )
+      count = count + 1
+    end
+  end 
+end
+
+function A2ADispatcherInitializator:SetSquadronMission(_squadronName, _CAPZone, _option, _A2ADispatcher)
+--  for i , mission in ipairs(_option.Missions) do
+    if _option.Missions == Mission.CAP then
+      local CAPZone = ZONE_POLYGON:New( "CAP" .. _squadronName, _CAPZone)
+      _A2ADispatcher:SetSquadronCap( _squadronName, CAPZone, _option.AttackAltitude[1], _option.AttackAltitude[2], _option.AttackSpeed[1], _option.AttackSpeed[2])
+      _A2ADispatcher:SetSquadronCapInterval(_squadronName, _option.CapLimit, _option.LowInterval, _option.HighInterval, _option.Probability)
+      _A2ADispatcher:SetSquadronGrouping( _squadronName, _option.CapGroupCount )
+      _A2ADispatcher:SetSquadronGci( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2])
+      _A2ADispatcher:SetSquadronFuelThreshold(_squadronName, _option.FuelThreshold)
+    elseif _option.Missions == Mission.Gci then
+      _A2ADispatcher:SetSquadronGci( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2])--, _option.AttackAltitude[1], _option.AttackAltitude[2])
+    elseif _option.Missions == Mission.SEAD then
+      _A2ADispatcher:SetSquadronSead( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2], _option.AttackAltitude[1], _option.AttackAltitude[2])
+    else 
+--      _A2ADispatcher:SetSquadronCas( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2], _option.AttackAltitude[1], _option.AttackAltitude[2])
+    end
+--  end
+end
+
+function A2ADispatcherInitializator:SetSquadronTakeoff(_squadronName, _option, _A2ADispatcher)
+  if _option.TakeoffMode == TakeoffMode.Air then
+    _A2ADispatcher:SetDefaultTakeoffInAir(_squadronName)
+  elseif _option.TakeoffMode == TakeoffMode.Cold then
+    _A2ADispatcher:SetDefaultTakeoffFromParkingCold(_squadronName)
+  elseif _option.TakeoffMode == TakeoffMode.Hot then
+    _A2ADispatcher:SetDefaultTakeoffFromParkingHot(_squadronName)
+  elseif _option.TakeoffMode == TakeoffMode.Runway then
+    _A2ADispatcher:SetDefaultTakeoffFromRunway(_squadronName) 
+  else
+    _A2ADispatcher:SetDefaultTakeoffFromParkingCold(_squadronName)
+  end
+end
+
+
+function A2ADispatcherInitializator:SetSquadronLand(_squadronName, _option, _A2ADispatcher)
+  if _option.LandMode == LandMode.NearAirbase then
+    _A2ADispatcher:SetSquadronLandingNearAirbase(_squadronName)
+  elseif _option.LandMode == LandMode.Runway then
+    _A2ADispatcher:SetSquadronLandingAtRunway(_squadronName)
+  elseif _option.LandMode == LandMode.Shutdown then
+    _A2ADispatcher:SetSquadronLandingAtEngineShutdown(_squadronName)
+  else 
+    _A2ADispatcher:SetSquadronLandingAtEngineShutdown(_squadronName)
+  end
+end-- Service per la gestione delle zone predefinite nella mappa attraverso i Trigger
 -- Per poter essere gestiti da questo service i trigger devono avere la segunte nomenclatura:
 -- Nome_Tipo_Sottotipo ex. Trigger112_0_0 = Trigger112_AG_CONVOY
 
@@ -627,36 +931,62 @@ function MDSDatabase:save()
   
 end
 --Based on Configuration.lua and pre-generated Database
-AIA2GProvider = {
-  ClassName = "AIA2GProvider"
+DispatchersProvider = {
+  ClassName = "DispatchersProvider"
 }
 
 
-function AIA2GProvider:Init() 
+function DispatchersProvider:Init() 
   local dispatchers = Configuration.Dispatchers
   
   for coalitionId, coalition in pairs(dispatchers) do
-    for nationId, nation in pairs(coalition) do
-      if nation.Active and nation.DispatcherType == Dispatcher.AG then  
-        local prefix = coalitionId .. "_" .. nationId .. "_"
-        local dispatcherOptions = AIA2GProvider:InitA2GDispatcherOptions(prefix,nation)
-        
-        local MissionsOptions = {} 
-        for unitId, unit in pairs(nation.Units) do
-          local option = AIA2GProvider:InitSquadronOption(coalitionId, nationId, unitId, unit)
-          
-          if option ~= nil then
-            option:SetTakeoffMode(unit.TakeoffMode)
-              :SetLandMode(unit.LandMode)
-              :SetTakeoffIntervall(unit.TakeoffIntervall)
+    if Configuration.Settings.Flags.Dispatchers[coalitionId .. "_Active"] then
+      for nationId, nation in pairs(coalition) do
+        if Configuration.Settings.Flags.Dispatchers[coalitionId .. "_" .. nationId .. "_Active"] then
+          for dispatcherId, dispatcher in ipairs(nation) do
+            if Configuration.Settings.Flags.Dispatchers[coalitionId .. "_" .. nationId .. "_" .. dispatcher.DispatcherType .. "_Active"] and dispatcher.DispatcherType == Dispatcher.AG then  
+              local prefix = coalitionId .. "_" .. nationId .. "_"
+              local dispatcherOptions = DispatchersProvider:InitA2GDispatcherOptions(prefix,dispatcher)
               
-            table.insert(MissionsOptions, option)
+              local MissionsOptions = {} 
+              for unitId, unit in pairs(dispatcher.Units) do
+                local option = DispatchersProvider:InitAGSquadronOption(coalitionId, nationId, dispatcher.DispatcherType, unitId, unit)
+                
+                if option ~= nil then
+                  option:SetTakeoffMode(dispatcher.TakeoffMode)
+                    :SetLandMode(dispatcher.LandMode)
+                    :SetTakeoffIntervall(dispatcher.TakeoffIntervall)
+                    
+                  table.insert(MissionsOptions, option)
+                end
+              end
+              
+              local A2GDispatcherInitializator = A2GDispatcherInitializator:New(dispatcherOptions)
+                :SetSquadronsOptions(MissionsOptions)
+                :Init()
+            elseif Configuration.Settings.Flags.Dispatchers[coalitionId .. "_" .. nationId .. "_" .. dispatcher.DispatcherType .. "_Active"] and dispatcher.DispatcherType == Dispatcher.AA then
+              local prefix = coalitionId .. "_" .. nationId .. "_"
+              local dispatcherOptions = DispatchersProvider:InitA2ADispatcherOptions(prefix,dispatcher)
+              
+              local MissionsOptions = {} 
+              for unitId, unit in pairs(dispatcher.Units) do
+                local option = DispatchersProvider:InitAASquadronOption(coalitionId, nationId, dispatcher.DispatcherType, unitId, unit)
+                
+                if option ~= nil then
+                  option:SetTakeoffMode(dispatcher.TakeoffMode)
+                    :SetLandMode(dispatcher.LandMode)
+                    :SetTakeoffIntervall(dispatcher.TakeoffIntervall)
+                    
+                  table.insert(MissionsOptions, option)
+                end
+              end
+              
+              local A2ADispatcherInitializator = A2ADispatcherInitializator:New(dispatcherOptions)
+                :SetSquadronsOptions(MissionsOptions)
+                :Init()
+            end
           end
         end
-        
-        local A2GDispatcherInitializator = A2GDispatcherInitializator:New(dispatcherOptions)
-          :SetSquadronsOptions(MissionsOptions)
-          :Init()
       end
     end
   end
@@ -664,7 +994,7 @@ function AIA2GProvider:Init()
   
 end
 
-function AIA2GProvider:InitA2GDispatcherOptions(prefix, dispatcher)
+function DispatchersProvider:InitA2GDispatcherOptions(prefix, dispatcher)
   local _result = A2GDispatcherOptions:New()
             :SetCommandCenter(prefix .. dispatcher.CommandCenter)
             :SetDetectionArea(dispatcher.DetectionArea)
@@ -680,13 +1010,28 @@ function AIA2GProvider:InitA2GDispatcherOptions(prefix, dispatcher)
   return _result
 end
 
-function AIA2GProvider:InitSquadronOption(coalition, faction, unitId, unit)
+
+function DispatchersProvider:InitA2ADispatcherOptions(prefix, dispatcher)
+  local _result = A2ADispatcherOptions:New()
+            :SetEngageRadius(dispatcher.EngageRadius)
+            :SetInterceptDelay(dispatcher.InterceptDelay)
+            :SetTacticalDisplay(dispatcher.TacticalDisplay)
+  for i, group in ipairs(dispatcher.DetectionGroups) do
+    _result:SetDetectionGroups(prefix .. group.Name, group.isPrefix)
+  end
+  for i, group in ipairs(dispatcher.CAPZones) do
+    _result:SetCAPZones(prefix .. group.Name, group.isPrefix)
+  end
+  return _result
+end
+
+function DispatchersProvider:InitAGSquadronOption(coalition, faction,  _dispatcherType, unitId, unit)
   --recupero i template in base all'unita ed alla missione
   local template = MDSDatabase:New():GetTemplates()[coalition].Factions[faction].Units[unitId]
     
   if template ~= nil and Configuration.Settings.Era >= tonumber(template.Era[1]) and Configuration.Settings.Era <= tonumber(template.Era[2]) then   
   for missionId, mission in pairs(unit.Missions) do
-    if mission.Active then
+        if  Configuration.Settings.Flags.Dispatchers[coalition .. "_" .. faction .. "_" .. _dispatcherType .. "_" .. unitId .. "_" .. missionId .. "_Active"]  then
      
       local option =  SquadronsOptions:New()
               :SetAttackAltitude(mission.AttackAltitude)
@@ -710,3 +1055,37 @@ function AIA2GProvider:InitSquadronOption(coalition, faction, unitId, unit)
   return nil
 end
 
+function DispatchersProvider:InitAASquadronOption(coalition, faction, _dispatcherType, unitId, unit)
+  --recupero i template in base all'unita ed alla missione
+  local template = MDSDatabase:New():GetTemplates()[coalition].Factions[faction].Units[unitId]
+    
+  if template ~= nil and Configuration.Settings.Era >= tonumber(template.Era[1]) and Configuration.Settings.Era <= tonumber(template.Era[2]) then   
+  for missionId, mission in pairs(unit.Missions) do
+        if  Configuration.Settings.Flags.Dispatchers[coalition .. "_" .. faction .. "_" .. _dispatcherType .. "_" .. unitId .. "_" .. missionId .. "_Active"]  then
+     
+      local option =  SquadronsOptions:New()
+              :SetAttackAltitude(mission.AttackAltitude)
+              :SetAttackSpeed(mission.AttackSpeed)
+              :SetOverhead(mission.Overhead)
+              :SetAirbaseResourceMode(mission.AirbaseResourceMode)
+              :SetMissions(missionId)
+              :SetResourceCount(mission.ResourceCount)
+              :SetTemplates(template.Missions[missionId].Templates)
+              :SetCapLimit(mission.CapLimit)
+              :SetLowInterval(mission.LowInterval)
+              :SetHighInterval(mission.HighInterval)
+              :SetProbability(mission.Probability)
+              :SetFuelThreshold(mission.FuelThreshold)
+              
+        for i, group in ipairs(unit.Airbases) do
+          option:SetAirbases( coalition .. "_" .. faction .. "_" .. group.Name, group.isPrefix)
+        end  
+        
+       
+              
+        return option
+      end
+    end
+  end
+  return nil
+end

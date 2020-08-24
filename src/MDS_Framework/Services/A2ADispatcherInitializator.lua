@@ -18,7 +18,7 @@ end
 
 function A2ADispatcherInitializator:Init() 
 
-  local Detection = DETECTION_AREAS:New( self.DispatcherOptions.DetectionGroups, self.DispatcherOptions.DetectionArea )
+  local Detection = DETECTION_AREAS:New( self.DispatcherOptions.DetectionGroups, self.DispatcherOptions.EngageRadius )
   local A2ADispatcher = AI_A2A_DISPATCHER:New( Detection )
   
   if self.DispatcherOptions.InterceptDelay ~= nil then

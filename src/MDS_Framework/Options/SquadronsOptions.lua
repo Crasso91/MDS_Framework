@@ -16,8 +16,7 @@ SquadronsOptions = {
   LowInterval = 30,
   HighInterval = 600,
   Probability = 1,
-  FuelThreshold = 2.5,
-  CapGroupCount = 1
+  FuelThreshold = 2.5
 }
 
 function SquadronsOptions:New()
@@ -100,24 +99,7 @@ function SquadronsOptions:SetFuelThreshold(_FuelThreshold)
   return self
 end
 
-function SquadronsOptions:SetCapGroupCount(_CapGroupCount)
-  self.CapGroupCount = _CapGroupCount
-  return self
-end
-
 function SquadronsOptions:SetGroups(_Groups, _arePrefix)
---  if _arePrefix then
---    self.Groups = GROUP_SET:New()
---      :FilterPrefixes(_Groups)
---      :FilterStart()
---      .Set
---  else
---    local foundedGroups = {}
---    for groupId, group in _Groups do
---      table.insert(foundedGroups, GROUP:New(group))
---    end
---    self.Groups = foundedGroups
---  end 
   self.Groups = _Groups
   return self
 end
@@ -131,10 +113,7 @@ function SquadronsOptions:SetTemplates(_templates)
       :_Prepare( _template.Group.name, math.random(1,10000) )
       
     local _templateGroup = SPAWN:NewFromTemplate(_templateGroup, _template.Group.name, _template.Group.name)
-      --:InitRandomizeZones({ ZONE:New("LATE_ACTIVED_ZONE") })
       :InitLateActivated(true)
-      --:SpawnFromCoordinate(PointVec2:AddX( 0 ):AddY( 0 ):GetVec2())
-      --:Spawn()
       :SpawnFromVec2({x=0,y=0})
       _DATABASE.GROUPS[_template.Group.name] = nil
       _DATABASE.Templates.Groups[_template.Group.name] = nil
@@ -151,8 +130,6 @@ function SquadronsOptions:SetAirbases(_Airbases, _arePrefix)
       
     for i, group in pairs(groups) do
     local airbaseFound = nil;
---      local airbase = SET_AIRBASE:New()
---        :FindAirbaseInRange(group:GetVec2(), 10000)
       for AirbaseName, AirbaseObject in pairs( _DATABASE.AIRBASES ) do
       
         local AirbaseCoordinate = AirbaseObject:GetCoordinate()
@@ -168,7 +145,6 @@ function SquadronsOptions:SetAirbases(_Airbases, _arePrefix)
       end
 
       table.insert(foundedGroups, airbaseFound)
-      env.info("asd")
     end
     
   else

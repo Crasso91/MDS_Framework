@@ -144,7 +144,6 @@ function DispatchersProvider:InitAASquadronOption(coalition, faction, _dispatche
               :SetHighInterval(mission.HighInterval)
               :SetProbability(mission.Probability)
               :SetFuelThreshold(mission.FuelThreshold)
-              :SetCapGroupCount(mission.CapGroupCount)
               
         for i, group in ipairs(unit.Airbases) do
           option:SetAirbases( coalition .. "_" .. faction .. "_" .. group.Name, group.isPrefix)

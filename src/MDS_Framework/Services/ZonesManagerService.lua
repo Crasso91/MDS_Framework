@@ -1,37 +1,8 @@
--- Service per la gestione delle zone predefinite nella mappa attraverso i Trigger
--- Per poter essere gestiti da questo service i trigger devono avere la segunte nomenclatura:
--- Nome_Tipo_Sottotipo ex. Trigger112_0_0 = Trigger112_AG_CONVOY
-
---Elenco delle numerazioni: 
---Tipi:
---AG = 0,
---AA = 1,
---Sottotipi:
---CONVOY = 0,
---CAP = 1,
---CAS = 2,
---STATIC = 3
-
 ZonesManagerService = {
   ClassName = "ZonesManagerService",
---  Zones = {},
---  ZonesCount = 0
 }
 
 function ZonesManagerService:New()
---  for ZoneID, ZoneData in pairs(DATABASE.ZONES) do
---    local zoneNameSplitted = split(ZoneData.ZoneName, "_")
---    local zoneName = zoneNameSplitted[0]
---    local type = zoneNameSplitted[1]
---    local subtype = zoneNameSplitted[2]
---    
---    local zoneEnriched = ZONE_ENRICHED:NEW(ZoneData, zoneName, type, subtype)
---    
---    if zoneName ~= nil then
---      self.Zones[zoneName] = zoneEnriched
---      self.ZonesCount = self.ZonesCount + 1;
---    end 
---  end
 return self
 end
 

@@ -109,3 +109,4 @@ function A2GDispatcherInitializator:SetSquadronLand(_squadronName, _option, _A2G
     _A2GDispatcher:SetSquadronLandingAtEngineShutdown(_squadronName)
   end
 end
+

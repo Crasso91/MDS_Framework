@@ -1,3 +1,4 @@
+
 A2GDispatcherOptions = {
   ClassName = "A2GDispatcherOptions",
   __index = A2GDispatcherOptions,
@@ -73,3 +74,4 @@ function A2GDispatcherOptions:SetDefenceCoordinates(_triggers, _arePrefix)
   end 
   return self
 end
+

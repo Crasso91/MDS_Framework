@@ -57,24 +57,30 @@ function A2ADispatcherInitializator:SetSquadrons(_A2ADispatcher)
     if option.AirbaseResourceMode == AirbaseResourceMode.EveryAirbase then
         for i,airbase in ipairs(option.Airbases) do
           local SquadronName = airbase.AirbaseName .. "_" .. count
-          _A2ADispatcher:SetSquadron( SquadronName, airbase.AirbaseName, option.Groups, option.ResourceCount )
-          self:SetSquadronMission(SquadronName, self.DispatcherOptions:GetRandomAvailableCap(), option, _A2ADispatcher)
-          self:SetSquadronTakeoff(SquadronName, option, _A2ADispatcher)
-          self:SetSquadronLand(SquadronName, option, _A2ADispatcher)
-          _A2ADispatcher:SetSquadronOverhead( SquadronName, option.OverHead )
-          _A2ADispatcher:SetSquadronTakeoffInterval( SquadronName, option.TakeoffIntervall )
-          count = count + 1
+          local availableCap = self.DispatcherOptions:GetAvailableCap()
+          if availableCap then
+            _A2ADispatcher:SetSquadron( SquadronName, airbase.AirbaseName, option.Groups, option.ResourceCount )
+            self:SetSquadronMission(SquadronName, availableCap, option, _A2ADispatcher)
+            self:SetSquadronTakeoff(SquadronName, option, _A2ADispatcher)
+            self:SetSquadronLand(SquadronName, option, _A2ADispatcher)
+            _A2ADispatcher:SetSquadronOverhead( SquadronName, option.OverHead )
+            _A2ADispatcher:SetSquadronTakeoffInterval( SquadronName, option.TakeoffIntervall )
+            count = count + 1
+          end
         end
     else
       local airbaseName = option:GetRandomAirbase().AirbaseName
       local SquadronName = airbaseName .. "_" .. count
-      _A2ADispatcher:SetSquadron( SquadronName, airbaseName, option.Groups, option.ResourceCount )
-      self:SetSquadronMission(SquadronName, self.DispatcherOptions:GetRandomAvailableCap(), option, _A2ADispatcher)
-      self:SetSquadronTakeoff(SquadronName, option, _A2ADispatcher)
-      self:SetSquadronLand(SquadronName, option, _A2ADispatcher)
-      _A2ADispatcher:SetSquadronOverhead( SquadronName, option.OverHead )
---      _A2ADispatcher:SetSquadronTakeoffInterval( SquadronName, option.TakeoffIntervall )
-      count = count + 1
+      local availableCap = self.DispatcherOptions:GetAvailableCap()
+      if availableCap then
+        _A2ADispatcher:SetSquadron( SquadronName, airbaseName, option.Groups, option.ResourceCount )
+        self:SetSquadronMission(SquadronName, availableCap, option, _A2ADispatcher)
+        self:SetSquadronTakeoff(SquadronName, option, _A2ADispatcher)
+        self:SetSquadronLand(SquadronName, option, _A2ADispatcher)
+        _A2ADispatcher:SetSquadronOverhead( SquadronName, option.OverHead )
+--       _A2ADispatcher:SetSquadronTakeoffInterval( SquadronName, option.TakeoffIntervall )
+        count = count + 1
+      end
     end
   end 
 end
@@ -124,3 +130,4 @@ function A2ADispatcherInitializator:SetSquadronLand(_squadronName, _option, _A2A
     _A2ADispatcher:SetSquadronLandingAtEngineShutdown(_squadronName)
   end
 end
+

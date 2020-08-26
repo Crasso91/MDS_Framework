@@ -105,22 +105,27 @@ function SquadronsOptions:SetGroups(_Groups, _arePrefix)
 end
 
 function SquadronsOptions:SetTemplates(_templates)
-  for id, _template in pairs(_templates) do
-    local group = GROUP:NewTemplate(_template.Group, _template.Group.CoalitionID, _template.Group.CategoryID, _template.Group.CountryID)
-    
-    local _templateGroup = SPAWN:New(_template.Group.name)
-      :InitLateActivated(true)
-      :_Prepare( _template.Group.name, math.random(1,10000) )
-      
-    local _templateGroup = SPAWN:NewFromTemplate(_templateGroup, _template.Group.name, _template.Group.name)
-      :InitLateActivated(true)
-      :SpawnFromVec2({x=0,y=0})
-      _DATABASE.GROUPS[_template.Group.name] = nil
-      _DATABASE.Templates.Groups[_template.Group.name] = nil
-    -- = group
-    table.insert(self.Groups, _templateGroup.GroupName)
-  end
-  return self;
+  self.Groups = TemplateManager:New()
+    :InitLazyGroupsByTemplates(_templates)
+    :GetLazyGroupsNames()
+  return self
+
+--  for id, _template in pairs(_templates) do
+--    local group = GROUP:NewTemplate(_template.Group, _template.Group.CoalitionID, _template.Group.CategoryID, _template.Group.CountryID)
+--    
+--    local _templateGroup = SPAWN:New(_template.Group.name)
+--      :InitLateActivated(true)
+--      :_Prepare( _template.Group.name, math.random(1,10000) )
+--      
+--    local _templateGroup = SPAWN:NewFromTemplate(_templateGroup, _template.Group.name, _template.Group.name)
+--      :InitLateActivated(true)
+--      :SpawnFromVec2({x=0,y=0})
+--      _DATABASE.GROUPS[_template.Group.name] = nil
+--      _DATABASE.Templates.Groups[_template.Group.name] = nil
+--    -- = group
+--    table.insert(self.Groups, _templateGroup.GroupName)
+--  end
+--  return self;
 end
 
 function SquadronsOptions:SetAirbases(_Airbases, _arePrefix)
@@ -167,3 +172,4 @@ function SquadronsOptions:GetRandomAirbase()
   
   return self.Airbases[random]
 end
+

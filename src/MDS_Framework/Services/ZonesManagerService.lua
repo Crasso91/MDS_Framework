@@ -53,6 +53,8 @@ function ZonesManagerService:GetRandomZoneByPrefix(_prefix)
   return set_zone.Set[set_zone.Index[random]]:GetZoneMaybe() 
 end
 
+
+
 --function ZonesManagerService:GetZoneByName(_zoneName)
 --  local zoneFound = self.AG[_zoneName]
 --  
@@ -110,4 +112,7 @@ end
 --  local random = math.random(0, zonesCount)
 --  return zones[random]
 --end
+
+
+
 

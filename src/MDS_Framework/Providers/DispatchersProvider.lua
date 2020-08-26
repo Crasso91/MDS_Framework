@@ -96,30 +96,30 @@ end
 function DispatchersProvider:InitAGSquadronOption(coalition, faction,  _dispatcherType, unitId, unit)
   --recupero i template in base all'unita ed alla missione
   local template = MDSDatabase:New():GetTemplates()[coalition].Factions[faction].Units[unitId]
-    
-  if template ~= nil and Configuration.Settings.Era >= tonumber(template.Era[1]) and Configuration.Settings.Era <= tonumber(template.Era[2]) then   
-  for missionId, mission in pairs(unit.Missions) do
-        if  Configuration.Settings.Flags.Dispatchers[coalition .. "_" .. faction .. "_" .. _dispatcherType .. "_" .. unitId .. "_" .. missionId .. "_Active"]  then
-     
-      local option =  SquadronsOptions:New()
-              :SetAttackAltitude(mission.AttackAltitude)
-              :SetAttackSpeed(mission.AttackSpeed)
-              :SetOverhead(mission.Overhead)
-              :SetAirbaseResourceMode(mission.AirbaseResourceMode)
-              :SetMissions(missionId)
-              :SetResourceCount(mission.ResourceCount)
-              :SetTemplates(template.Missions[missionId].Templates)
-              
-        for i, group in ipairs(unit.Airbases) do
-          option:SetAirbases( coalition .. "_" .. faction .. "_" .. group.Name, group.isPrefix)
-        end  
-        
+  
+  if template ~= nil and Configuration.Settings.Era >= tonumber(template.Era[1]) and Configuration.Settings.Era <= tonumber(template.Era[2]) then
+    for missionId, mission in pairs(unit.Missions) do
+          if  Configuration.Settings.Flags.Dispatchers[coalition .. "_" .. faction .. "_" .. _dispatcherType .. "_" .. unitId .. "_" .. missionId .. "_Active"]  then
        
-              
-        return option
+        local option =  SquadronsOptions:New()
+                :SetAttackAltitude(mission.AttackAltitude)
+                :SetAttackSpeed(mission.AttackSpeed)
+                :SetOverhead(mission.Overhead)
+                :SetAirbaseResourceMode(mission.AirbaseResourceMode)
+                :SetMissions(missionId)
+                :SetResourceCount(mission.ResourceCount)
+                :SetTemplates(template.Missions[missionId].Templates)
+                
+          for i, group in ipairs(unit.Airbases) do
+            option:SetAirbases( coalition .. "_" .. faction .. "_" .. group.Name, group.isPrefix)
+          end  
+          
+         
+                
+          return option
+        end
       end
     end
-  end
   return nil
 end
 

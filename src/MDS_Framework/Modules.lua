@@ -9,6 +9,8 @@ __Moose.Include( 'Scripts/Options/SquadronsOptions.lua' )
 __Moose.Include( 'Scripts/Services/A2GDispatcherInitializator.lua' )
 __Moose.Include( 'Scripts/Services/A2ADispatcherInitializator.lua' )
 __Moose.Include( 'Scripts/Services/ZonesManagerService.lua' )
+__Moose.Include( 'Scripts/Services/ConvoyService.lua' )
+__Moose.Include( 'Scripts/Services/TemplateManager.lua' )
 
 __Moose.Include( 'Scripts/DataLayer/Database/Database.lua' )
 

@@ -33,6 +33,7 @@ Mission = {
   CAS = "CAS",
   BAI = "BAI",
   SEAD = "SEAD",
+  GROUND = "GROUND",
   GCI = "GCI"
 }
 
@@ -44,7 +45,13 @@ Dispatcher = {
   GCI = "GCI"
 }
 
-Configuration = {
+Categories = {
+  AIRPLANE = 0,
+  HELICOPTER = 1,
+  GROUND = 2,
+  SHIP = 3,
+  TRAIN = 4,
+}Configuration = {
     Settings = {
     Coalition = "Blue",
     Nation = "USA",
@@ -542,22 +549,27 @@ function SquadronsOptions:SetGroups(_Groups, _arePrefix)
 end
 
 function SquadronsOptions:SetTemplates(_templates)
-  for id, _template in pairs(_templates) do
-    local group = GROUP:NewTemplate(_template.Group, _template.Group.CoalitionID, _template.Group.CategoryID, _template.Group.CountryID)
-    
-    local _templateGroup = SPAWN:New(_template.Group.name)
-      :InitLateActivated(true)
-      :_Prepare( _template.Group.name, math.random(1,10000) )
-      
-    local _templateGroup = SPAWN:NewFromTemplate(_templateGroup, _template.Group.name, _template.Group.name)
-      :InitLateActivated(true)
-      :SpawnFromVec2({x=0,y=0})
-      _DATABASE.GROUPS[_template.Group.name] = nil
-      _DATABASE.Templates.Groups[_template.Group.name] = nil
-    -- = group
-    table.insert(self.Groups, _templateGroup.GroupName)
-  end
-  return self;
+  self.Groups = TemplateManager:New()
+    :InitLazyGroupsByTemplates(_templates)
+    :GetLazyGroupsNames()
+  return self
+
+--  for id, _template in pairs(_templates) do
+--    local group = GROUP:NewTemplate(_template.Group, _template.Group.CoalitionID, _template.Group.CategoryID, _template.Group.CountryID)
+--    
+--    local _templateGroup = SPAWN:New(_template.Group.name)
+--      :InitLateActivated(true)
+--      :_Prepare( _template.Group.name, math.random(1,10000) )
+--      
+--    local _templateGroup = SPAWN:NewFromTemplate(_templateGroup, _template.Group.name, _template.Group.name)
+--      :InitLateActivated(true)
+--      :SpawnFromVec2({x=0,y=0})
+--      _DATABASE.GROUPS[_template.Group.name] = nil
+--      _DATABASE.Templates.Groups[_template.Group.name] = nil
+--    -- = group
+--    table.insert(self.Groups, _templateGroup.GroupName)
+--  end
+--  return self;
 end
 
 function SquadronsOptions:SetAirbases(_Airbases, _arePrefix)
@@ -603,7 +615,9 @@ function SquadronsOptions:GetRandomAirbase()
   local random = math.random(1,count)
   
   return self.Airbases[random]
-endA2GDispatcherInitializator = {
+end
+
+A2GDispatcherInitializator = {
   ClassName = "A2GDispatcherInitializator",
   DispatcherOptions = nil,
   Options = nil
@@ -774,24 +788,30 @@ function A2ADispatcherInitializator:SetSquadrons(_A2ADispatcher)
     if option.AirbaseResourceMode == AirbaseResourceMode.EveryAirbase then
         for i,airbase in ipairs(option.Airbases) do
           local SquadronName = airbase.AirbaseName .. "_" .. count
-          _A2ADispatcher:SetSquadron( SquadronName, airbase.AirbaseName, option.Groups, option.ResourceCount )
-          self:SetSquadronMission(SquadronName, self.DispatcherOptions:GetRandomAvailableCap(), option, _A2ADispatcher)
-          self:SetSquadronTakeoff(SquadronName, option, _A2ADispatcher)
-          self:SetSquadronLand(SquadronName, option, _A2ADispatcher)
-          _A2ADispatcher:SetSquadronOverhead( SquadronName, option.OverHead )
-          _A2ADispatcher:SetSquadronTakeoffInterval( SquadronName, option.TakeoffIntervall )
-          count = count + 1
+          local availableCap = self.DispatcherOptions:GetAvailableCap()
+          if availableCap then
+            _A2ADispatcher:SetSquadron( SquadronName, airbase.AirbaseName, option.Groups, option.ResourceCount )
+            self:SetSquadronMission(SquadronName, availableCap, option, _A2ADispatcher)
+            self:SetSquadronTakeoff(SquadronName, option, _A2ADispatcher)
+            self:SetSquadronLand(SquadronName, option, _A2ADispatcher)
+            _A2ADispatcher:SetSquadronOverhead( SquadronName, option.OverHead )
+            _A2ADispatcher:SetSquadronTakeoffInterval( SquadronName, option.TakeoffIntervall )
+            count = count + 1
+          end
         end
     else
       local airbaseName = option:GetRandomAirbase().AirbaseName
       local SquadronName = airbaseName .. "_" .. count
-      _A2ADispatcher:SetSquadron( SquadronName, airbaseName, option.Groups, option.ResourceCount )
-      self:SetSquadronMission(SquadronName, self.DispatcherOptions:GetRandomAvailableCap(), option, _A2ADispatcher)
-      self:SetSquadronTakeoff(SquadronName, option, _A2ADispatcher)
-      self:SetSquadronLand(SquadronName, option, _A2ADispatcher)
-      _A2ADispatcher:SetSquadronOverhead( SquadronName, option.OverHead )
---      _A2ADispatcher:SetSquadronTakeoffInterval( SquadronName, option.TakeoffIntervall )
-      count = count + 1
+      local availableCap = self.DispatcherOptions:GetAvailableCap()
+      if availableCap then
+        _A2ADispatcher:SetSquadron( SquadronName, airbaseName, option.Groups, option.ResourceCount )
+        self:SetSquadronMission(SquadronName, availableCap, option, _A2ADispatcher)
+        self:SetSquadronTakeoff(SquadronName, option, _A2ADispatcher)
+        self:SetSquadronLand(SquadronName, option, _A2ADispatcher)
+        _A2ADispatcher:SetSquadronOverhead( SquadronName, option.OverHead )
+--       _A2ADispatcher:SetSquadronTakeoffInterval( SquadronName, option.TakeoffIntervall )
+        count = count + 1
+      end
     end
   end 
 end
@@ -840,7 +860,9 @@ function A2ADispatcherInitializator:SetSquadronLand(_squadronName, _option, _A2A
   else 
     _A2ADispatcher:SetSquadronLandingAtEngineShutdown(_squadronName)
   end
-endZonesManagerService = {
+end
+
+ZonesManagerService = {
   ClassName = "ZonesManagerService",
 }
 
@@ -894,6 +916,8 @@ function ZonesManagerService:GetRandomZoneByPrefix(_prefix)
   
   return set_zone.Set[set_zone.Index[random]]:GetZoneMaybe() 
 end
+
+
 
 --function ZonesManagerService:GetZoneByName(_zoneName)
 --  local zoneFound = self.AG[_zoneName]
@@ -953,10 +977,332 @@ end
 --  return zones[random]
 --end
 
+
+
+
+
+ConvoyService = {
+  ClassName = "ConvoyService",
+  Configuration = Configuration.Settings,
+  SendMessageOnSpawn = false,
+  Message = "Enemy convoy at $cordinates moving to $compassDirection Heading ($heading)",
+  StartZones = {},
+  EndZone = {},
+  Groups = {},
+  GroupType = nil,
+  Faction = nil,
+  MenuCoalition = nil,
+  ConvoyCoalition = nil,
+  Type = nil,
+  SpawnOnMenuAction = false,
+  Menu = "Convoy",
+  Command = "Spawn Convoy",
+  MenuCoalitionObject = nil,
+  UnitNumber = 3
+}
+
+function ConvoyService:New()
+  self = ConvoyService
+  return self
+end
+
+function ConvoyService:SetGroup(_group) 
+  self.Groups  = { GROUP:FindByName(_group).GroupName }
+  return self
+end
+
+function ConvoyService:SetGroupType(_type)
+  self.GroupType = _type
+  return self
+end
+
+function ConvoyService:SetFaction(_faction) 
+  self.Faction = _faction
+  return self
+end
+
+function ConvoyService:SetCoalition(_coalition) 
+  self.Coalition = _coalition
+  return self
+end
+
+function ConvoyService:SetCategory(_category) 
+  self.Category = _category
+  return self
+end
+
+function ConvoyService:SetUnitNumber(_unitNumber)
+  self.UnitNumber = _unitNumber
+  return self
+end
+
+function ConvoyService:SetStartZones(_startZones, _isPrefix) 
+  if _isPrefix then
+    self.StartZones = ZonesManagerService:GetZonesByPrefix(_startZones)
+    --self.StartZones = { ZonesManagerService:GetRandomZoneByPrefix(_startZones) }
+  else
+    self.StartZones = { ZONE:New(_startZones) }
+  end
+  return self
+end
+
+function ConvoyService:SetRandomEndZone(_endZones, _isPrefix) 
+  if _isPrefix then
+    self.EndZone = ZonesManagerService:GetRandomZoneByPrefix(_endZones)
+  else
+    self.EndZone = { ZONE:New(_endZones) }
+  end
+  return self
+end
+
+function ConvoyService:SetMessageOnSpawn(_message)
+  self.SendMessageOnSpawn = true
+  if _message ~= nil then self.Message = _message end
+  return self
+end
+
+function ConvoyService:AssignTask()
+  self.AssignTask = true
+  return self
+end
+
+function ConvoyService:InitGroupByFilters()
+  if table.getn(self.Groups) ~= 0 then return self.Groups  end
+  self.Groups = TemplateManager:New()
+    --:InitLazyGroupsByFilters(self.Coalition, self.Faction, self.Category, Mission.GROUND, self.GroupType)
+    :InitLazyConovyGroupByFilters(self.UnitNumber, self.Coalition, self.Faction, self.Category, Mission.GROUND, self.GroupType)
+    :GetLazyGroupsNames()
+end
+
+function ConvoyService:SetMenuAction(_menu, _command, _coalition)
+  self.SpawnOnMenuAction = true
+  self.Command = _command 
+  self.MenuCoalition = _coalition 
+  self.MenuCoalitionObject =  MENU_COALITION:New(_coalition, _menu)
+  
+  return self
+end
+
+function ConvoyService:GetRandomizedSpawn()
+  self:InitGroupByFilters()
+  local SpawnConvoy = self:GetSpawnObject()
+  
+  if self.SpawnOnMenuAction then
+    MENU_COALITION_COMMAND:New(self.MenuCoalition, self.Command, self.MenuCoalitionObject, 
+      function () 
+        --SpawnConvoy:SpawnScheduled(5, 0.5)
+        SpawnConvoy:Spawn() 
+      end
+    )
+  end
+  return SpawnConvoy
+end
+
+function ConvoyService:Spawn()
+  self:InitGroupByFilters()
+  local SpawnConvoy = self:GetSpawnObject()
+  
+  if self.SpawnOnMenuAction then
+    MENU_COALITION_COMMAND:New(self.MenuCoalition, self.Command, self.MenuCoalitionObject, 
+      function () 
+        --SpawnConvoy:SpawnScheduled(5, 0.5)
+        SpawnConvoy:Spawn() 
+      end
+    )
+  else
+        --SpawnConvoy:SpawnScheduled(5, 0.5)
+  SpawnConvoy:Spawn() 
+  end
+end 
+
+function ConvoyService:GetSpawnObject()
+  local GroundOrgZones = {}
+  
+  for zoneId, zone in pairs(self.StartZones) do
+     table.insert(GroundOrgZones, zone)
+  end
+  
+  local unitSpawn = SPAWN:New( self.Groups[1] )
+    :InitLimit(self.UnitNumber,self.UnitNumber)
+    --:InitGrouping(self.UnitNumber)
+  
+  if table.getn(self.Groups) > 1 then
+    unitSpawn:InitRandomizeTemplate(self.Groups)
+  end
+  
+  unitSpawn
+    :InitRandomizeRoute( 100, 100, 200 ) 
+    --:InitRandomizePosition(1000, 10)
+    :InitRandomizeUnits(true, 2000, 300)
+    :InitRandomizeZones( GroundOrgZones )
+    :OnSpawnGroup(
+      function(SpawnGroup)
+        env.info("Convoy " .. SpawnGroup.GroupName .. " Spawned")
+        SpawnGroup:TaskRouteToZone(self.EndZone,true,150,"On Road")
+        local aaAlert = false;
+        for i,u in pairs(SpawnGroup:GetUnits()) do
+          if u:GetDCSObject():getAttributes()["Air Defence"] ~= nil then
+            aaAlert = true
+          end
+        end
+        
+        if self.SendMessageOnSpawn then
+          local vec2Start = SpawnGroup:GetPointVec2()
+          local direction = SpawnGroup:GetPointVec3():GetDirectionVec3(self.EndZone:GetCoordinate())
+          local azimuth = SpawnGroup:GetPointVec3():GetAngleDegrees(direction)
+          local compass_brackets = {"N", "NE", "E", "SE", "S", "SW", "W", "NW", "N"}
+          local compass_lookup = math.floor(azimuth / 45) + 1
+          local compass_direction = compass_brackets[compass_lookup]
+          if compass_direction == nil then compass_direction = "" end
+          azimuth = math.floor(azimuth)
+          if string.len(azimuth) == 2 then azimuth = "0" .. azimuth end
+          if string.len(azimuth) == 1 then azimuth = "00" .. azimuth end
+          
+          --local message = "Enemy convoy at " .. vec2Start:ToStringLLDDM(nil) .. " moving to " .. compass_direction .. " Heading (" .. azimuth .. ")"
+          
+          self.Message = self.Message:gsub( "$cordinates", vec2Start:ToStringLLDDM(nil) )
+          self.Message = self.Message:gsub( "$compassDirection", compass_direction )
+          self.Message = self.Message:gsub( "$heading", azimuth )
+          
+          if aaAlert then
+            self.Message = self.Message .. " - Possible anti-aircraft threat in the area"
+          end
+          
+          MESSAGE:New(self.Message, 10):ToBlue()
+          
+          if self.SpawnOnMenuAction then
+           
+            MENU_COALITION_COMMAND:New(self.MenuCoalition, "Delete convoy " .. SpawnGroup.GroupName, self.MenuCoalitionObject, 
+              function(removeMenu)
+                SpawnGroup:Destroy(true)
+                env.info("Convoy " .. self.Groups.GroupName .. " Removed")
+                local masterObject = SCHEDULER:New(self.MenuCoalitionObject:GetMenu("Delete convoy " .. SpawnGroup.GroupName))
+                masterObject:Schedule(self.MenuCoalitionObject:GetMenu("Delete convoy " .. SpawnGroup.GroupName),
+                  function (mo, commandMenu) 
+                    commandMenu:Remove()
+                  end
+                , {self.MenuCoalitionObject:GetMenu("Delete convoy " .. SpawnGroup.GroupName)}, .5)
+                env.info("Remove command deleted")
+              end)
+          end
+        end
+      end
+  )
+  return unitSpawn
+end
+TemplateManager = {
+  ClassName = "TemplateManager",
+  LazyGroups = {}
+}
+
+function TemplateManager:New()
+  self.db = MDSDatabase:New()
+  self.LazyGroups = {}
+  return self
+end
+
+function TemplateManager:GetLazyGroups()
+  return self.LazyGroups
+end
+
+function TemplateManager:GetLazyGroupsNames()
+  local _result = {}
+  for i,g in pairs(self.LazyGroups) do
+    table.insert(_result, g.GroupName)
+  end
+  return _result
+end
+
+function TemplateManager:InitLazyGroupsByFilters(_coalition, _faction, _category, _mission, _unitType)
+  --local _templates = self.db:GetTemplatesBy(_coalition, _faction, _category, _mission, _unitType)
+  local _templates = self.db:FilterCoalition(_coalition)
+    :FilterFactions({ _faction })
+    :FilterCategories({ _category })
+    :FilterMissions({ _mission })
+    :FilterUnitTypes({ _unitType })
+    :FilterStart()
+    :GetFilterResult()
+    
+  self:InitLazyGroupsByTemplates(_templates)
+  return self
+end
+
+function TemplateManager:InitLazyConovyGroupByFilters(_unitNumber, _coalition, _faction, _category, _mission, _unitType)
+  --local _templates = self.db:GetTemplatesBy(_coalition, _faction, _category, _mission, _unitType)
+  local _templates = self.db:FilterCoalition(_coalition)
+    :FilterFactions({ _faction })
+    :FilterCategories({ _category })
+    :FilterMissions({ _mission })
+    :FilterUnitTypes({ _unitType })
+    :FilterStart()
+    :GetFilterResult()
+  
+  local convoy = _templates[math.random(1, table.getn(_templates))]
+  convoy.Group.name = "Dynamic Generated Conovy"
+  for i = 2, _unitNumber - 1 do
+    local _unit = _templates[math.random(1, table.getn(_templates))]
+    convoy.Group.units[i] = _unit.Group.units[1]
+--    convoy.Group.units[i].x = convoy.Group.units[1].x + math.random(1, 1000) + (i * 100)
+--    convoy.Group.units[i].y = convoy.Group.units[1].y + math.random(1, 1000) + (i * 100)
+  end
+  
+  self:InitLazyGroupByTemplate(convoy)
+  return self
+end
+
+
+function TemplateManager:InitLazyGroupByTemplate(_template)
+  local group = GROUP:NewTemplate(_template.Group, _template.Group.CoalitionID, _template.Group.CategoryID, _template.Group.CountryID)
+    
+  local _templateGroup = SPAWN:New(_template.Group.name)
+    :InitLateActivated(true)
+    :_Prepare( _template.Group.name, math.random(1,10000) )
+    
+  local _templateGroup = SPAWN:NewFromTemplate(_templateGroup, _template.Group.name, _template.Group.name)
+    :InitLateActivated(true)
+    :SpawnFromVec2({x=0,y=0})
+    
+  _DATABASE.GROUPS[_template.Group.name] = nil
+  _DATABASE.Templates.Groups[_template.Group.name] = nil
+  
+  table.insert(self.LazyGroups, _templateGroup)
+  return self
+end
+
+function TemplateManager:InitLazyGroupsByTemplates(_templates)
+  local _result = {}
+  for i,t in pairs(_templates) do
+    local group = GROUP:NewTemplate(t.Group, t.Group.CoalitionID, t.Group.CategoryID, t.Group.CountryID)
+      
+    local _templateGroup = SPAWN:New(t.Group.name)
+      :InitLateActivated(true)
+      :_Prepare( t.Group.name, math.random(1,10000) )
+      
+    local _templateGroup = SPAWN:NewFromTemplate(_templateGroup, t.Group.name, t.Group.name)
+      :InitLateActivated(true)
+      :SpawnFromVec2({x=0,y=0})
+      
+    _DATABASE.GROUPS[t.Group.name] = nil
+    _DATABASE.Templates.Groups[t.Group.name] = nil
+    
+    table.insert(self.LazyGroups, _templateGroup)
+  end
+  return self
+end
+
+
 local flatdb = require 'flatdb'
 
 MDSDatabase = {
-  templates = {}
+  templates = {},
+  Coalition = nil,
+  Factions = {},
+  Categories = {},
+  Types = {},
+  UnitNames = {},
+  Missions = {},
+  Era = nil,
+  FilterResult = {}
 }
 
 function MDSDatabase:New() 
@@ -976,12 +1322,177 @@ function MDSDatabase:SetTemplates(_templates)
   return self
 end
 
+function MDSDatabase:FilterCoalition(_in)
+  self.Coalition = _in
+  return self
+end
+
+function MDSDatabase:FilterFactions(_in)
+  self.Factions = _in
+  return self
+end
+
+function MDSDatabase:FilterCategories(_in)
+  self.Categories = _in
+  return self
+end
+
+function MDSDatabase:FilterUnitTypes(_in)
+  self.Types = _in
+  return self
+end
+
+function MDSDatabase:FilterUnitNames(_in)
+  self.UnitNames = _in
+  return self
+end
+
+function MDSDatabase:FilterMissions(_in)
+  self.Missions = _in
+  return self
+end
+
+function MDSDatabase:FilterEra(_in)
+  self.Era = _in
+  return self
+end
+
+function MDSDatabase:GetFilterResult()
+  return self.FilterResult
+end
+
+function MDSDatabase:FilterStart()
+  local templates = self:GetTemplates()
+  if self.Coalition then
+     for cId,c in pairs(templates) do  
+      if cId ~= self.Coalition then
+        templates[cId] = nil
+      end
+    end
+  end
+  
+  if table.getn(self.Factions) >0 then
+    for cId,c in pairs(templates) do  
+      for fId, f in pairs(templates[cId].Factions) do
+        if not self:ArrayHasValue(self.Factions, fId) then
+          c.Factions[fId] = nil
+        end
+      end
+    end
+  end
+  
+  if table.getn(self.UnitNames) > 0 then
+    for cId,c in pairs(templates) do  
+      for fId, f in pairs(templates[cId].Factions) do
+        for uId,u in pairs(templates[cId].Factions[fId].Units) do
+          if not self:ArrayHasValue(self.UnitNames,uId) then
+            f.Units[uId] = nil
+          end
+        end
+      end
+    end
+  end
+   
+  if table.getn(self.Missions) > 0 then
+    for cId,c in pairs(templates) do  
+      for fId, f in pairs(templates[cId].Factions) do
+        for uId,u in pairs(templates[cId].Factions[fId].Units) do
+          for mId,m in pairs(u.Missions) do
+            if not self:ArrayHasValue(self.Missions,mId) then
+              u.Missions[mId] = nil
+            elseif (self.Era ~= nil and self.Era < tonumber(u.Era[1]) and self.Era > tonumber(u.Era[2])) then
+              u.Missions[mId] = nil
+            end
+          end
+        end
+      end
+    end
+  end
+  
+  if table.getn(self.Categories) > 0 then
+    for cId,c in pairs(templates) do  
+      for fId, f in pairs(templates[cId].Factions) do
+        for uId,u in pairs(templates[cId].Factions[fId].Units) do
+          for mId,m in pairs(u.Missions) do
+            for tId,t in pairs(m.Templates) do
+                if not self:ArrayHasValue(self.Categories,t.Group.CategoryID )
+                 then
+                  m.Templates[tId] = nil
+                end
+              end
+          end
+        end
+      end
+    end
+  end
+  
+  if table.getn(self.Types) > 0 then
+    for cId,c in pairs(templates) do  
+      for fId, f in pairs(templates[cId].Factions) do
+        for uId,u in pairs(templates[cId].Factions[fId].Units) do
+          for mId,m in pairs(u.Missions) do
+            for tId,t in pairs(m.Templates) do
+                if not self:ArrayHasValue(self.Types,t.Group.units[1].type )
+                 then
+                  m.Templates[tId] = nil
+                end
+              end
+          end
+        end
+      end
+    end
+  end
+  
+  for cId,c in pairs(templates) do  
+      for fId, f in pairs(templates[cId].Factions) do
+        for uId,u in pairs(templates[cId].Factions[fId].Units) do
+          for mId,m in pairs(u.Missions) do
+            for tId,t in pairs(m.Templates) do
+                table.insert(self.FilterResult, t)
+              end
+          end
+        end
+      end
+    end
+  
+  --return templates
+  return self
+end
+
+function MDSDatabase:GetTemplatesBy(_coalition, _faction, _category, _mission, _type)
+  local templates = self:GetTemplates()[_coalition].Factions[_faction]
+  local _result = {}
+  local template = nil
+  
+  for i,u in pairs(templates.Units) do
+    if u.Missions[_mission] ~= nil then
+      for y,t in pairs(u.Missions[_mission].Templates) do
+        if   t.Group.units[1].type == _type  or (_type == nil and t.Group.CategoryID == _category)  then
+--          template = t
+          table.insert(_result, t)
+        end
+      end
+    end
+  end
+  
+  return _result
+end
+
 function MDSDatabase:save() 
 
   self.db:save()
   
 end
---Based on Configuration.lua and pre-generated Database
+
+function MDSDatabase:ArrayHasValue (tab, val)
+    for index, value in ipairs(tab) do
+        if value == val then
+            return true
+        end
+    end
+
+    return false
+end--Based on Configuration.lua and pre-generated Database
 DispatchersProvider = {
   ClassName = "DispatchersProvider"
 }
@@ -1079,30 +1590,30 @@ end
 function DispatchersProvider:InitAGSquadronOption(coalition, faction,  _dispatcherType, unitId, unit)
   --recupero i template in base all'unita ed alla missione
   local template = MDSDatabase:New():GetTemplates()[coalition].Factions[faction].Units[unitId]
-    
-  if template ~= nil and Configuration.Settings.Era >= tonumber(template.Era[1]) and Configuration.Settings.Era <= tonumber(template.Era[2]) then   
-  for missionId, mission in pairs(unit.Missions) do
-        if  Configuration.Settings.Flags.Dispatchers[coalition .. "_" .. faction .. "_" .. _dispatcherType .. "_" .. unitId .. "_" .. missionId .. "_Active"]  then
-     
-      local option =  SquadronsOptions:New()
-              :SetAttackAltitude(mission.AttackAltitude)
-              :SetAttackSpeed(mission.AttackSpeed)
-              :SetOverhead(mission.Overhead)
-              :SetAirbaseResourceMode(mission.AirbaseResourceMode)
-              :SetMissions(missionId)
-              :SetResourceCount(mission.ResourceCount)
-              :SetTemplates(template.Missions[missionId].Templates)
-              
-        for i, group in ipairs(unit.Airbases) do
-          option:SetAirbases( coalition .. "_" .. faction .. "_" .. group.Name, group.isPrefix)
-        end  
-        
+  
+  if template ~= nil and Configuration.Settings.Era >= tonumber(template.Era[1]) and Configuration.Settings.Era <= tonumber(template.Era[2]) then
+    for missionId, mission in pairs(unit.Missions) do
+          if  Configuration.Settings.Flags.Dispatchers[coalition .. "_" .. faction .. "_" .. _dispatcherType .. "_" .. unitId .. "_" .. missionId .. "_Active"]  then
        
-              
-        return option
+        local option =  SquadronsOptions:New()
+                :SetAttackAltitude(mission.AttackAltitude)
+                :SetAttackSpeed(mission.AttackSpeed)
+                :SetOverhead(mission.Overhead)
+                :SetAirbaseResourceMode(mission.AirbaseResourceMode)
+                :SetMissions(missionId)
+                :SetResourceCount(mission.ResourceCount)
+                :SetTemplates(template.Missions[missionId].Templates)
+                
+          for i, group in ipairs(unit.Airbases) do
+            option:SetAirbases( coalition .. "_" .. faction .. "_" .. group.Name, group.isPrefix)
+          end  
+          
+         
+                
+          return option
+        end
       end
     end
-  end
   return nil
 end
 

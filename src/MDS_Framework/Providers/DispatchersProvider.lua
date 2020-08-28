@@ -8,11 +8,11 @@ function DispatchersProvider:Init()
   local dispatchers = Configuration.Dispatchers
   
   for coalitionId, coalition in pairs(dispatchers) do
-    if Configuration.Settings.Flags.Dispatchers[coalitionId .. "_Active"] then
+    if Configuration.Settings.Flags.Dispatchers[coalitionId] then
       for nationId, nation in pairs(coalition) do
-        if Configuration.Settings.Flags.Dispatchers[coalitionId .. "_" .. nationId .. "_Active"] then
+        if Configuration.Settings.Flags.Dispatchers[coalitionId .. "_" .. nationId] then
           for dispatcherId, dispatcher in ipairs(nation) do
-            if Configuration.Settings.Flags.Dispatchers[coalitionId .. "_" .. nationId .. "_" .. dispatcher.DispatcherType .. "_Active"] and dispatcher.DispatcherType == Dispatcher.AG then  
+            if Configuration.Settings.Flags.Dispatchers[coalitionId .. "_" .. nationId .. "_" .. dispatcher.DispatcherType] and dispatcher.DispatcherType == Dispatcher.AG then  
               local prefix = coalitionId .. "_" .. nationId .. "_"
               local dispatcherOptions = DispatchersProvider:InitA2GDispatcherOptions(prefix,dispatcher)
               
@@ -32,7 +32,7 @@ function DispatchersProvider:Init()
               local A2GDispatcherInitializator = A2GDispatcherInitializator:New(dispatcherOptions)
                 :SetSquadronsOptions(MissionsOptions)
                 :Init()
-            elseif Configuration.Settings.Flags.Dispatchers[coalitionId .. "_" .. nationId .. "_" .. dispatcher.DispatcherType .. "_Active"] and dispatcher.DispatcherType == Dispatcher.AA then
+            elseif Configuration.Settings.Flags.Dispatchers[coalitionId .. "_" .. nationId .. "_" .. dispatcher.DispatcherType] and dispatcher.DispatcherType == Dispatcher.AA then
               local prefix = coalitionId .. "_" .. nationId .. "_"
               local dispatcherOptions = DispatchersProvider:InitA2ADispatcherOptions(prefix,dispatcher)
               
@@ -93,14 +93,21 @@ function DispatchersProvider:InitA2ADispatcherOptions(prefix, dispatcher)
   return _result
 end
 
-function DispatchersProvider:InitAGSquadronOption(coalition, faction,  _dispatcherType, unitId, unit)
+function DispatchersProvider:InitAGSquadronOption(_coalition, faction,  _dispatcherType, unitId, unit)
   --recupero i template in base all'unita ed alla missione
-  local template = MDSDatabase:New():GetTemplates()[coalition].Factions[faction].Units[unitId]
-  
-  if template ~= nil and Configuration.Settings.Era >= tonumber(template.Era[1]) and Configuration.Settings.Era <= tonumber(template.Era[2]) then
+--  local template = MDSDatabase:New():GetTemplates()[_coalition].Factions[faction].Units[unitId]
+
+--  if template ~= nil and Configuration.Settings.Era >= tonumber(template.Era[1]) and Configuration.Settings.Era <= tonumber(template.Era[2]) then
     for missionId, mission in pairs(unit.Missions) do
-          if  Configuration.Settings.Flags.Dispatchers[coalition .. "_" .. faction .. "_" .. _dispatcherType .. "_" .. unitId .. "_" .. missionId .. "_Active"]  then
-       
+      if  Configuration.Settings.Flags.Dispatchers[_coalition .. "_" .. faction .. "_" .. _dispatcherType .. "_" .. unitId .. "_" .. missionId]  then
+        local templates = MDSDatabase:New()
+          :FilterCoalition(UtilitiesService:GetEnumKeyByValue(coalition.side,_coalition))
+          :FilterFactions({ UtilitiesService:GetEnumKeyByValue(country.id,faction) })
+          :FilterUnitNames({ unitId })
+          :FilterMissions({ missionId })
+          :FilterEra(Configuration.Settings.Era)
+          :FilterStart()
+          :GetFilterResult()
         local option =  SquadronsOptions:New()
                 :SetAttackAltitude(mission.AttackAltitude)
                 :SetAttackSpeed(mission.AttackSpeed)
@@ -108,10 +115,10 @@ function DispatchersProvider:InitAGSquadronOption(coalition, faction,  _dispatch
                 :SetAirbaseResourceMode(mission.AirbaseResourceMode)
                 :SetMissions(missionId)
                 :SetResourceCount(mission.ResourceCount)
-                :SetTemplates(template.Missions[missionId].Templates)
+                :SetTemplates(templates)
                 
           for i, group in ipairs(unit.Airbases) do
-            option:SetAirbases( coalition .. "_" .. faction .. "_" .. group.Name, group.isPrefix)
+            option:SetAirbases( _coalition .. "_" .. faction .. "_" .. group.Name, group.isPrefix)
           end  
           
          
@@ -119,18 +126,25 @@ function DispatchersProvider:InitAGSquadronOption(coalition, faction,  _dispatch
           return option
         end
       end
-    end
+--    end
   return nil
 end
 
-function DispatchersProvider:InitAASquadronOption(coalition, faction, _dispatcherType, unitId, unit)
+function DispatchersProvider:InitAASquadronOption(_coalition, faction, _dispatcherType, unitId, unit)
   --recupero i template in base all'unita ed alla missione
-  local template = MDSDatabase:New():GetTemplates()[coalition].Factions[faction].Units[unitId]
+--  local template = MDSDatabase:New():GetTemplates()[_coalition].Factions[faction].Units[unitId]
     
-  if template ~= nil and Configuration.Settings.Era >= tonumber(template.Era[1]) and Configuration.Settings.Era <= tonumber(template.Era[2]) then   
+--  if template ~= nil and Configuration.Settings.Era >= tonumber(template.Era[1]) and Configuration.Settings.Era <= tonumber(template.Era[2]) then   
   for missionId, mission in pairs(unit.Missions) do
-        if  Configuration.Settings.Flags.Dispatchers[coalition .. "_" .. faction .. "_" .. _dispatcherType .. "_" .. unitId .. "_" .. missionId .. "_Active"]  then
-     
+    if  Configuration.Settings.Flags.Dispatchers[_coalition .. "_" .. faction .. "_" .. _dispatcherType .. "_" .. unitId .. "_" .. missionId]  then
+      local templates = MDSDatabase:New()
+          :FilterCoalition(UtilitiesService:GetEnumKeyByValue(coalition.side,_coalition))
+          :FilterFactions({ UtilitiesService:GetEnumKeyByValue(country.id,faction) })
+          :FilterUnitNames({ unitId })
+          :FilterMissions({ missionId })
+          :FilterEra(Configuration.Settings.Era)
+          :FilterStart()
+          :GetFilterResult()
       local option =  SquadronsOptions:New()
               :SetAttackAltitude(mission.AttackAltitude)
               :SetAttackSpeed(mission.AttackSpeed)
@@ -138,7 +152,7 @@ function DispatchersProvider:InitAASquadronOption(coalition, faction, _dispatche
               :SetAirbaseResourceMode(mission.AirbaseResourceMode)
               :SetMissions(missionId)
               :SetResourceCount(mission.ResourceCount)
-              :SetTemplates(template.Missions[missionId].Templates)
+              :SetTemplates(templates)
               :SetCapLimit(mission.CapLimit)
               :SetLowInterval(mission.LowInterval)
               :SetHighInterval(mission.HighInterval)
@@ -146,14 +160,11 @@ function DispatchersProvider:InitAASquadronOption(coalition, faction, _dispatche
               :SetFuelThreshold(mission.FuelThreshold)
               
         for i, group in ipairs(unit.Airbases) do
-          option:SetAirbases( coalition .. "_" .. faction .. "_" .. group.Name, group.isPrefix)
-        end  
-        
-       
-              
+          option:SetAirbases(  _coalition .. "_" .. faction .. "_" .. group.Name, group.isPrefix)
+        end    
         return option
       end
     end
-  end
+  --end
   return nil
 end

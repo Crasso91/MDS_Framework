@@ -16,3 +16,7 @@ __Moose.Include( 'Scripts/DataLayer/Database/Database.lua' )
 
 __Moose.Include( 'Scripts/Providers/DispatchersProvider.lua' )
 
+__Moose.Include( 'Scripts/MooseExtensions/SPAWN.lua' )
+__Moose.Include( 'Scripts/Utilities/UtilitiesService.lua' )
+
+

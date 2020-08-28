@@ -104,31 +104,23 @@ end
 function ConvoyService:GetRandomizedSpawn()
   self:InitGroupByFilters()
   local SpawnConvoy = self:GetSpawnObject()
-  
-  if self.SpawnOnMenuAction then
-    MENU_COALITION_COMMAND:New(self.MenuCoalition, self.Command, self.MenuCoalitionObject, 
-      function () 
-        --SpawnConvoy:SpawnScheduled(5, 0.5)
-        SpawnConvoy:Spawn() 
-      end
-    )
-  end
   return SpawnConvoy
 end
 
 function ConvoyService:Spawn()
-  self:InitGroupByFilters()
-  local SpawnConvoy = self:GetSpawnObject()
   
   if self.SpawnOnMenuAction then
     MENU_COALITION_COMMAND:New(self.MenuCoalition, self.Command, self.MenuCoalitionObject, 
       function () 
-        --SpawnConvoy:SpawnScheduled(5, 0.5)
+        self.Groups = {}
+        self:InitGroupByFilters()
+        local SpawnConvoy = self:GetSpawnObject()
         SpawnConvoy:Spawn() 
       end
     )
   else
-        --SpawnConvoy:SpawnScheduled(5, 0.5)
+  self:InitGroupByFilters()
+  local SpawnConvoy = self:GetSpawnObject()
   SpawnConvoy:Spawn() 
   end
 end 
@@ -141,7 +133,7 @@ function ConvoyService:GetSpawnObject()
   end
   
   local unitSpawn = SPAWN:New( self.Groups[1] )
-    :InitLimit(self.UnitNumber,self.UnitNumber)
+    :InitLimit(self.UnitNumber,1)
     --:InitGrouping(self.UnitNumber)
   
   if table.getn(self.Groups) > 1 then
@@ -150,8 +142,8 @@ function ConvoyService:GetSpawnObject()
   
   unitSpawn
     :InitRandomizeRoute( 1, 1, 200 ) 
-    --:InitRandomizePosition(1000, 10)
-    :InitRandomizeUnits(true, 2000, 300)
+    :InitRandomizePosition(500, 50)
+    :InitRandomizeUnits(true,500,50)
     :InitRandomizeZones( GroundOrgZones )
     :OnSpawnGroup(
       function(SpawnGroup)

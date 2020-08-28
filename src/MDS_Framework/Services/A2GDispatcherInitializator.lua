@@ -46,7 +46,7 @@ function A2GDispatcherInitializator:SetSquadrons(_A2GDispatcher)
   for i,option in ipairs(self.Options) do
     if option.AirbaseResourceMode == AirbaseResourceMode.EveryAirbase then
         for i,airbase in ipairs(option.Airbases) do
-          local SquadronName = airbase.AirbaseName .. "_" .. count
+          local SquadronName = airbase.AirbaseName .."_" .. count
           _A2GDispatcher:SetSquadron( SquadronName, airbase.AirbaseName, option.Groups, option.ResourceCount )
           self:SetSquadronMission(SquadronName, option, _A2GDispatcher)
           self:SetSquadronTakeoff(SquadronName, option, _A2GDispatcher)
@@ -57,7 +57,7 @@ function A2GDispatcherInitializator:SetSquadrons(_A2GDispatcher)
         end
     else
       local airbaseName = option:GetRandomAirbase().AirbaseName
-      local SquadronName = airbaseName .. "_" .. count
+      local SquadronName = airbaseName .."_" .. count
       _A2GDispatcher:SetSquadron( SquadronName, airbaseName, option.Groups, option.ResourceCount )
       self:SetSquadronMission(SquadronName, option, _A2GDispatcher)
       self:SetSquadronTakeoff(SquadronName, option, _A2GDispatcher)

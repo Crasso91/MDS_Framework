@@ -15,6 +15,9 @@ MDSDatabase = {
 function MDSDatabase:New() 
   local self = BASE:Inherit( self, BASE:New() )
   local dbDirectory = lfs.writedir() .. [[databases]]
+  if Configuration.Settings.DatabasePath ~= nil and Configuration.Settings.DatabasePath ~= "" then
+    dbDirectory = Configuration.Settings.DatabasePath
+  end
   self.db = flatdb(dbDirectory) 
   return self
 end

@@ -102,7 +102,7 @@ function DispatchersProvider:InitAGSquadronOption(_coalition, faction,  _dispatc
       if  Configuration.Settings.Flags.Dispatchers[_coalition .. "_" .. faction .. "_" .. _dispatcherType .. "_" .. unitId .. "_" .. missionId]  then
         local templates = MDSDatabase:New()
           :FilterCoalition(UtilitiesService:GetEnumKeyByValue(coalition.side,_coalition))
-          :FilterFactions({ UtilitiesService:GetEnumKeyByValue(country.id,faction) })
+          :FilterFactions({ country.name[faction] })
           :FilterUnitNames({ unitId })
           :FilterMissions({ missionId })
           :FilterEra(Configuration.Settings.Era)
@@ -139,7 +139,7 @@ function DispatchersProvider:InitAASquadronOption(_coalition, faction, _dispatch
     if  Configuration.Settings.Flags.Dispatchers[_coalition .. "_" .. faction .. "_" .. _dispatcherType .. "_" .. unitId .. "_" .. missionId]  then
       local templates = MDSDatabase:New()
           :FilterCoalition(UtilitiesService:GetEnumKeyByValue(coalition.side,_coalition))
-          :FilterFactions({ UtilitiesService:GetEnumKeyByValue(country.id,faction) })
+          :FilterFactions({ country.name[faction] })
           :FilterUnitNames({ unitId })
           :FilterMissions({ missionId })
           :FilterEra(Configuration.Settings.Era)

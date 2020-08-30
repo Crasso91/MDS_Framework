@@ -25,7 +25,7 @@ function SquadronsOptions:New()
 end
 
 function SquadronsOptions:SetAttackAltitude(_AttackAltitude)
-  self.AttackSpeed = _AttackAltitude
+  self.AttackAltitude = _AttackAltitude
   return self
 end
 
@@ -162,14 +162,6 @@ function SquadronsOptions:SetAirbases(_Airbases, _arePrefix)
 end
 
 function SquadronsOptions:GetRandomAirbase()
-  local count = 0
-  
-  for i,airbase in ipairs(self.Airbases) do
-    count = count + 1
-  end
-  
-  local random = math.random(1,count)
-  
-  return self.Airbases[random]
+  return self.Airbases[math.random(1,UtilitiesService:Lenght(self.Airbases))]
 end
 

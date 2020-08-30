@@ -28,30 +28,24 @@ function ZonesManagerService:GetRandomZone()
   local zones = SET_ZONE:New()
     :FilterPrefixes()
     :FilterStart()
-  local count = 0
   
-  for zoneId, zone in pairs(zones) do
-    count = count + 1  
-  end
-  
-  local random = math.random(0, count)
-  
-  return zones[random]
+  return zones[math.random(0, UtilitiesService:Lenght(zones))]
 end
 
 function ZonesManagerService:GetRandomZoneByPrefix(_prefix)
   env.info("GetRandomZoneByPrefix")
   local set_zone = self:GetSetZonesByPrefix(_prefix)
+  
+  --local random = math.random(1, table.getn(set_zone) - 1)
   local count = 0
-  
-  for zoneId, zone in pairs(set_zone.Set) do
-    count = count + 1  
+  for k,v in pairs(set_zone.Set) do
+    count = count + 1
   end
-  
-  local random = math.random(1, count)
+  local random = math.random(1, UtilitiesService:Lenght(set_zone.Set))
   
   return set_zone.Set[set_zone.Index[random]]:GetZoneMaybe() 
 end
+
 
 
 

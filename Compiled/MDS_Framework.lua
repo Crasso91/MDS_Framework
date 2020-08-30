@@ -51,13 +51,20 @@ Categories = {
   GROUND = 2,
   SHIP = 3,
   TRAIN = 4,
-}Configuration = {
+}
+
+
+Configuration = {
     Settings = {
     Coalition = "Blue",
     Nation = "USA",
     Era = 2000,
     TakeoffMode = TakeoffMode.Runway,
     LandMode = LandMode.Runway,
+    DatabasePath = "C:\\Users\\danie\\Saved Games\\DCS.openbeta\\databases",
+    Dependecies = {
+      Moose = "E:\\Projects\\GitHub\\MOOSE\\Compiled\\Moose.lua"
+    },
   Flags = {
     TacticalDiplay = false, 
     Dispatchers = {
@@ -174,10 +181,10 @@ Configuration.Dispatchers = {
                 ResourceCount = 8,
                 CapLimit = 2,
                 CapGroupCount = 4,
-                LowInterval = 30,
-                HighInterval = 450,
+                LowInterval = 10,
+                HighInterval = 30,
                 Probability = 1,
-                FuelThreshold = 2.5,
+                FuelThreshold = 0.25,
               }
             }
           }, 
@@ -191,13 +198,33 @@ Configuration.Dispatchers = {
                 AttackSpeed = { 450, 2520 },
                 Overhead = 0.5,
                 AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
-                ResourceCount = 8,
+                ResourceCount = 3,
                 CapLimit = 2,
                 CapGroupCount = 4,
-                LowInterval = 30,
-                HighInterval = 450,
+                LowInterval = 10,
+                HighInterval = 30,
                 Probability = 1,
-                FuelThreshold = 2.5,
+                FuelThreshold = 0.25,
+              }
+            }
+          }, 
+          ["F-15C"] = {
+            Airbases = { 
+              { Name = "Airbase_CAP_SEAD", isPrefix = true }  
+            },
+            Missions = {
+              [Mission.GCI] = {
+                AttackAltitude = { 15000 , 25000 },
+                AttackSpeed = { 450, 2650 },
+                Overhead = 0.5,
+                AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
+                ResourceCount = 4,
+                CapLimit = 2,
+                CapGroupCount = 4,
+                LowInterval = 10,
+                HighInterval = 30,
+                Probability = 1,
+                FuelThreshold = 0.25,
               }
             }
           }
@@ -231,13 +258,13 @@ Configuration.Dispatchers = {
                 AttackSpeed = { 450, 2500 },
                 Overhead = 0.25,
                 AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
-                ResourceCount = 6,
+                ResourceCount = 8,
                 CapLimit = 2,
                 CapGroupCount = 2,
-                LowInterval = 30,
-                HighInterval = 600,
+                LowInterval = 10,
+                HighInterval = 30,
                 Probability = 1,
-                FuelThreshold = 2.5,
+                FuelThreshold = 0.25,
               }
             }
           },
@@ -254,10 +281,10 @@ Configuration.Dispatchers = {
                 ResourceCount = 6,
                 CapLimit = 2,
                 CapGroupCount = 2,
-                LowInterval = 30,
-                HighInterval = 600,
+                LowInterval = 10,
+                HighInterval = 30,
                 Probability = 1,
-                FuelThreshold = 2.5,
+                FuelThreshold = 0.25,
               }
             }
           },
@@ -271,13 +298,13 @@ Configuration.Dispatchers = {
                 AttackSpeed = { 450, 3000 },
                 Overhead = 0.25,
                 AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
-                ResourceCount = 6,
+                ResourceCount = 2,
                 CapLimit = 2,
                 CapGroupCount = 2,
-                LowInterval = 30,
-                HighInterval = 600,
+                LowInterval = 10,
+                HighInterval = 30,
                 Probability = 1,
-                FuelThreshold = 2.5,
+                FuelThreshold = 0.25,
               }
             }
           }
@@ -286,6 +313,60 @@ Configuration.Dispatchers = {
     }
   }
 }
+
+UtilitiesService = {
+	ClassName = "UtilitiesService"
+}
+
+function UtilitiesService:ArrayHasValue (tab, val)
+    for index, value in ipairs(tab) do
+        if value == val then
+            return true
+        end
+    end
+
+    return false
+end
+
+function UtilitiesService:GetEnumKeyByValue(_enum, _id) 
+  for k,v in pairs(_enum) do
+    if k == _id then return v end 
+  end
+  return nil
+end
+
+function UtilitiesService:GetRandomOfUnsequncialTable(_table)
+  local _random = math.random(1, UtilitiesService:Lenght(_table))
+  local _count = 1
+  
+  for i,row in pairs(_table) do
+    if _count == _random then
+      return row
+    else
+      _count = _count + 1
+    end
+  end
+  return nil
+end
+
+function UtilitiesService:Lenght(_table)
+  local count = 0
+  for k,v in pairs(_table) do
+    count = count + 1
+  end    
+  return count
+end
+
+function UtilitiesService:LoadDependecies() 
+  for k,v in pairs(Configuration.Settings.Dependecies) do
+    assert(loadfile(v))()
+  end
+end
+
+
+
+UtilitiesService:LoadDependecies()
+
 
 
 A2GDispatcherOptions = {
@@ -482,7 +563,7 @@ function SquadronsOptions:New()
 end
 
 function SquadronsOptions:SetAttackAltitude(_AttackAltitude)
-  self.AttackSpeed = _AttackAltitude
+  self.AttackAltitude = _AttackAltitude
   return self
 end
 
@@ -619,15 +700,7 @@ function SquadronsOptions:SetAirbases(_Airbases, _arePrefix)
 end
 
 function SquadronsOptions:GetRandomAirbase()
-  local count = 0
-  
-  for i,airbase in ipairs(self.Airbases) do
-    count = count + 1
-  end
-  
-  local random = math.random(1,count)
-  
-  return self.Airbases[random]
+  return self.Airbases[math.random(1,UtilitiesService:Lenght(self.Airbases))]
 end
 
 A2GDispatcherInitializator = {
@@ -905,30 +978,24 @@ function ZonesManagerService:GetRandomZone()
   local zones = SET_ZONE:New()
     :FilterPrefixes()
     :FilterStart()
-  local count = 0
   
-  for zoneId, zone in pairs(zones) do
-    count = count + 1  
-  end
-  
-  local random = math.random(0, count)
-  
-  return zones[random]
+  return zones[math.random(0, UtilitiesService:Lenght(zones))]
 end
 
 function ZonesManagerService:GetRandomZoneByPrefix(_prefix)
   env.info("GetRandomZoneByPrefix")
   local set_zone = self:GetSetZonesByPrefix(_prefix)
+  
+  --local random = math.random(1, table.getn(set_zone) - 1)
   local count = 0
-  
-  for zoneId, zone in pairs(set_zone.Set) do
-    count = count + 1  
+  for k,v in pairs(set_zone.Set) do
+    count = count + 1
   end
-  
-  local random = math.random(1, count)
+  local random = math.random(1, UtilitiesService:Lenght(set_zone.Set))
   
   return set_zone.Set[set_zone.Index[random]]:GetZoneMaybe() 
 end
+
 
 
 
@@ -1000,7 +1067,7 @@ ConvoyService = {
   SendMessageOnSpawn = false,
   Message = "Enemy convoy at $cordinates moving to $compassDirection Heading ($heading)",
   StartZones = {},
-  EndZone = {},
+  EndZones = {},
   Groups = {},
   GroupType = nil,
   Faction = nil,
@@ -1011,7 +1078,10 @@ ConvoyService = {
   Menu = "Convoy",
   Command = "Spawn Convoy",
   MenuCoalitionObject = nil,
-  UnitNumber = 3
+  MenuIntelObject = nil,
+  MenuConvoyObject = nil,
+  UnitNumber = 3,
+  RequestableIntel = true
 }
 
 function ConvoyService:New()
@@ -1049,28 +1119,25 @@ function ConvoyService:SetUnitNumber(_unitNumber)
   return self
 end
 
-function ConvoyService:SetStartZones(_startZones, _isPrefix) 
-  if _isPrefix then
-    self.StartZones = ZonesManagerService:GetZonesByPrefix(_startZones)
-    --self.StartZones = { ZonesManagerService:GetRandomZoneByPrefix(_startZones) }
-  else
-    self.StartZones = { ZONE:New(_startZones) }
-  end
+function ConvoyService:SetStartZones(_startZones, _isPrefix)
+  self.StartZones = { Zones = _startZones, isPrefix = _isPrefix } 
   return self
 end
 
-function ConvoyService:SetRandomEndZone(_endZones, _isPrefix) 
-  if _isPrefix then
-    self.EndZone = ZonesManagerService:GetRandomZoneByPrefix(_endZones)
-  else
-    self.EndZone = { ZONE:New(_endZones) }
-  end
+function ConvoyService:SetEndZones(_endZones, _isPrefix) 
+  self.EndZones = { Zones = _endZones, isPrefix = _isPrefix } 
+  
   return self
 end
 
 function ConvoyService:SetMessageOnSpawn(_message)
   self.SendMessageOnSpawn = true
   if _message ~= nil then self.Message = _message end
+  return self
+end
+
+function ConvoyService:SetRequestableIntel(_in)
+  self.RequestableIntel = _in
   return self
 end
 
@@ -1099,14 +1166,6 @@ end
 function ConvoyService:GetRandomizedSpawn()
   self:InitGroupByFilters()
   local SpawnConvoy = self:GetSpawnObject()
-  
-  if self.SpawnOnMenuAction then
-    MENU_COALITION_COMMAND:New(self.MenuCoalition, self.Command, self.MenuCoalitionObject, 
-      function () 
-        SpawnConvoy:Spawn() 
-      end
-    )
-  end
   return SpawnConvoy
 end
 
@@ -1115,7 +1174,7 @@ function ConvoyService:Spawn()
   if self.SpawnOnMenuAction then
     MENU_COALITION_COMMAND:New(self.MenuCoalition, self.Command, self.MenuCoalitionObject, 
       function () 
-        self.Groups = nil
+        self.Groups = {}
         self:InitGroupByFilters()
         local SpawnConvoy = self:GetSpawnObject()
         SpawnConvoy:Spawn() 
@@ -1130,8 +1189,25 @@ end
 
 function ConvoyService:GetSpawnObject()
   local GroundOrgZones = {}
+  local startZones = {}
+  local endZone = {}
   
-  for zoneId, zone in pairs(self.StartZones) do
+  if self.StartZones.isPrefix then
+    startZones = ZonesManagerService:GetZonesByPrefix(self.StartZones.Zones)
+  else
+    for zoneId, zone in pairs(elf.StartZones) do
+      table.insert(startZones, zone)
+    end
+  end
+  
+  if self.EndZones.isPrefix then
+    endZone = ZonesManagerService:GetRandomZoneByPrefix(self.EndZones.Zones)
+  else
+    local randomZone = self.EndZones.Zones[math.random(1, UtilitiesService:Lenght(self.EndZones.Zones))]
+    endZone = ZONE:New(self.EndZones.Zones)
+  end
+  
+  for zoneId, zone in pairs(startZones) do
      table.insert(GroundOrgZones, zone)
   end
   
@@ -1151,58 +1227,82 @@ function ConvoyService:GetSpawnObject()
     :OnSpawnGroup(
       function(SpawnGroup)
         env.info("Convoy " .. SpawnGroup.GroupName .. " Spawned")
-        SpawnGroup:TaskRouteToZone(self.EndZone,true,150,"On Road")
-        local aaAlert = false;
-        for i,u in pairs(SpawnGroup:GetUnits()) do
-          if u:GetDCSObject():getAttributes()["Air Defence"] ~= nil then
-            aaAlert = true
-          end
-        end
+        SpawnGroup:TaskRouteToZone(endZone,true,150,"On Road")
         
         if self.SendMessageOnSpawn then
-          local vec2Start = SpawnGroup:GetPointVec2()
-          local direction = SpawnGroup:GetPointVec3():GetDirectionVec3(self.EndZone:GetCoordinate())
-          local azimuth = SpawnGroup:GetPointVec3():GetAngleDegrees(direction)
-          local compass_brackets = {"N", "NE", "E", "SE", "S", "SW", "W", "NW", "N"}
-          local compass_lookup = math.floor(azimuth / 45) + 1
-          local compass_direction = compass_brackets[compass_lookup]
-          if compass_direction == nil then compass_direction = "" end
-          azimuth = math.floor(azimuth)
-          if string.len(azimuth) == 2 then azimuth = "0" .. azimuth end
-          if string.len(azimuth) == 1 then azimuth = "00" .. azimuth end
           
-          --local message = "Enemy convoy at " .. vec2Start:ToStringLLDDM(nil) .. " moving to " .. compass_direction .. " Heading (" .. azimuth .. ")"
-          
-          self.Message = self.Message:gsub( "$cordinates", vec2Start:ToStringLLDDM(nil) )
-          self.Message = self.Message:gsub( "$compassDirection", compass_direction )
-          self.Message = self.Message:gsub( "$heading", azimuth )
-          
-          if aaAlert then
-            self.Message = self.Message .. " - Possible anti-aircraft threat in the area"
-          end
-          
-          MESSAGE:New(self.Message, 10):ToBlue()
+          self:SendIntelMessage(SpawnGroup, endZone)
           
           if self.SpawnOnMenuAction then
-           
-            MENU_COALITION_COMMAND:New(self.MenuCoalition, "Delete convoy " .. SpawnGroup.GroupName, self.MenuCoalitionObject, 
+          
+            self.MenuConvoyObject =  MENU_COALITION:New(self.MenuCoalition, SpawnGroup.GroupName, self.MenuCoalitionObject)
+             SpawnGroup:HandleEvent(EVENTS.Dead, function ()
+                if table.getn(SpawnGroup:GetUnits()) == 1 then
+                  self:RemoveMenu(SpawnGroup.GroupName)
+                end 
+              end
+              )
+            
+            if self.RequestableIntel then
+              MENU_COALITION_COMMAND:New(self.MenuCoalition, "Intel",self.MenuConvoyObject, function() self:SendIntelMessage(SpawnGroup, endZone) end)
+            end
+            
+            MENU_COALITION_COMMAND:New(self.MenuCoalition, "Delete convoy", self.MenuConvoyObject, 
               function(removeMenu)
                 SpawnGroup:Destroy(true)
-                env.info("Convoy " .. self.Groups.GroupName .. " Removed")
-                local masterObject = SCHEDULER:New(self.MenuCoalitionObject:GetMenu("Delete convoy " .. SpawnGroup.GroupName))
-                masterObject:Schedule(self.MenuCoalitionObject:GetMenu("Delete convoy " .. SpawnGroup.GroupName),
-                  function (mo, commandMenu) 
-                    commandMenu:Remove()
-                  end
-                , {self.MenuCoalitionObject:GetMenu("Delete convoy " .. SpawnGroup.GroupName)}, .5)
-                env.info("Remove command deleted")
-              end)
+                env.info("Convoy " .. SpawnGroup.GroupName .. " Removed")
+              end
+            )
           end
         end
       end
   )
   return unitSpawn
 end
+
+function ConvoyService:SendIntelMessage(_SpawnGroup, _endZone)
+  local message = "" 
+  local vec2Start = _SpawnGroup:GetPointVec2()
+  local direction = _SpawnGroup:GetPointVec3():GetDirectionVec3(_endZone:GetCoordinate())
+  local azimuth = _SpawnGroup:GetPointVec3():GetAngleDegrees(direction)
+  local compass_brackets = {"N", "NE", "E", "SE", "S", "SW", "W", "NW", "N"}
+  local compass_lookup = math.floor(azimuth / 45) + 1
+  local compass_direction = compass_brackets[compass_lookup]
+  if compass_direction == nil then compass_direction = "" end
+  azimuth = math.floor(azimuth)
+  if string.len(azimuth) == 2 then azimuth = "0" .. azimuth end
+  if string.len(azimuth) == 1 then azimuth = "00" .. azimuth end
+  
+  --local message = "Enemy convoy at " .. vec2Start:ToStringLLDDM(nil) .. " moving to " .. compass_direction .. " Heading (" .. azimuth .. ")"
+  
+  self.Message = self.Message:gsub( "$cordinates", vec2Start:ToStringLLDDM(nil) )
+  self.Message = self.Message:gsub( "$compassDirection", compass_direction )
+  self.Message = self.Message:gsub( "$heading", azimuth )
+  message = self.Message
+  local aaAlert = false;
+  for i,u in pairs(_SpawnGroup:GetUnits()) do
+    if u:GetDCSObject():getAttributes()["Air Defence"] ~= nil then
+      aaAlert = true
+    end
+  end
+        
+  if aaAlert then
+    message = message .. " - Possible anti-aircraft threat in the area"
+  end
+  
+  MESSAGE:New(message, 10):ToCoalition(self.MenuCoalition)
+end
+
+function ConvoyService:RemoveMenu(_menuId) 
+  local masterObject = SCHEDULER:New(self.MenuCoalitionObject:GetMenu(_menuId))
+  masterObject:Schedule(nil,
+    function (commandMenu) 
+      commandMenu:Remove()
+      env.info("Remove command deleted")
+    end
+  , {self.MenuCoalitionObject:GetMenu(_menuId)}, .5)
+end
+
 TemplateManager = {
   ClassName = "TemplateManager",
   LazyGroups = {},
@@ -1251,10 +1351,10 @@ function TemplateManager:InitLazyConovyGroupByFilters(_unitNumber, _coalition, _
     :FilterStart()
     :GetFilterResult()
   
-  local convoy = _templates[math.random(1, table.getn(_templates))]
+  local convoy = routines.utils.deepCopy(UtilitiesService:GetRandomOfUnsequncialTable(_templates))
   convoy.Group.name = convoy.Group.name .. "_Dynamic"
   for i = 2, _unitNumber do
-    local _unit =  routines.utils.deepCopy(_templates[math.random(1, table.getn(_templates))])
+    local _unit =  routines.utils.deepCopy(UtilitiesService:GetRandomOfUnsequncialTable(_templates))
 --    local _unit = routines.utils.deepCopy(_templates[2])
     convoy.Group.units[i] = _unit.Group.units[1]
     convoy.Group.units[i].x = convoy.Group.units[1].x + math.random(1, 1000) + (i * 100)
@@ -1335,6 +1435,9 @@ MDSDatabase = {
 function MDSDatabase:New() 
   local self = BASE:Inherit( self, BASE:New() )
   local dbDirectory = lfs.writedir() .. [[databases]]
+  if Configuration.Settings.DatabasePath ~= nil and Configuration.Settings.DatabasePath ~= "" then
+    dbDirectory = Configuration.Settings.DatabasePath
+  end
   self.db = flatdb(dbDirectory) 
   return self
 end
@@ -1633,7 +1736,7 @@ function DispatchersProvider:InitAGSquadronOption(_coalition, faction,  _dispatc
       if  Configuration.Settings.Flags.Dispatchers[_coalition .. "_" .. faction .. "_" .. _dispatcherType .. "_" .. unitId .. "_" .. missionId]  then
         local templates = MDSDatabase:New()
           :FilterCoalition(UtilitiesService:GetEnumKeyByValue(coalition.side,_coalition))
-          :FilterFactions({ UtilitiesService:GetEnumKeyByValue(country.id,faction) })
+          :FilterFactions({ country.name[faction] })
           :FilterUnitNames({ unitId })
           :FilterMissions({ missionId })
           :FilterEra(Configuration.Settings.Era)
@@ -1670,7 +1773,7 @@ function DispatchersProvider:InitAASquadronOption(_coalition, faction, _dispatch
     if  Configuration.Settings.Flags.Dispatchers[_coalition .. "_" .. faction .. "_" .. _dispatcherType .. "_" .. unitId .. "_" .. missionId]  then
       local templates = MDSDatabase:New()
           :FilterCoalition(UtilitiesService:GetEnumKeyByValue(coalition.side,_coalition))
-          :FilterFactions({ UtilitiesService:GetEnumKeyByValue(country.id,faction) })
+          :FilterFactions({ country.name[faction] })
           :FilterUnitNames({ unitId })
           :FilterMissions({ missionId })
           :FilterEra(Configuration.Settings.Era)
@@ -1935,25 +2038,5 @@ function SPAWN:SpawnWithIndex( SpawnIndex, NoBirth )
     --self:E( { self.SpawnTemplatePrefix, "No more Groups to Spawn:", SpawnIndex, self.SpawnMaxGroups } )
   end
 
-  return nil
-end
-UtilitiesService = {
-	ClassName = "UtilitiesService"
-}
-
-function UtilitiesService:ArrayHasValue (tab, val)
-    for index, value in ipairs(tab) do
-        if value == val then
-            return true
-        end
-    end
-
-    return false
-end
-
-function UtilitiesService:GetEnumKeyByValue(_enum, _id) 
-  for k,v in pairs(_enum) do
-    if k == _id then return v end 
-  end
   return nil
 end

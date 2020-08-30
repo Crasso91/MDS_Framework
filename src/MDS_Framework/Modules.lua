@@ -1,6 +1,8 @@
 __Moose.Include( 'Scripts/Enumerators/Enumerators.lua' )
-
 __Moose.Include( 'Scripts/Globals/Configuration.lua' )
+__Moose.Include( 'Scripts/Utilities/UtilitiesService.lua' )
+__Moose.Include( 'Scripts/Utilities/FrameworkInit.lua' )
+
 
 __Moose.Include( 'Scripts/Options/A2GDispatcherOptions.lua' )
 __Moose.Include( 'Scripts/Options/A2ADispatcherOptions.lua' )
@@ -17,6 +19,5 @@ __Moose.Include( 'Scripts/DataLayer/Database/Database.lua' )
 __Moose.Include( 'Scripts/Providers/DispatchersProvider.lua' )
 
 __Moose.Include( 'Scripts/MooseExtensions/SPAWN.lua' )
-__Moose.Include( 'Scripts/Utilities/UtilitiesService.lua' )
 
 

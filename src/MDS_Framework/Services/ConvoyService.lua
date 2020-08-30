@@ -5,7 +5,7 @@ ConvoyService = {
   SendMessageOnSpawn = false,
   Message = "Enemy convoy at $cordinates moving to $compassDirection Heading ($heading)",
   StartZones = {},
-  EndZone = {},
+  EndZones = {},
   Groups = {},
   GroupType = nil,
   Faction = nil,
@@ -16,7 +16,10 @@ ConvoyService = {
   Menu = "Convoy",
   Command = "Spawn Convoy",
   MenuCoalitionObject = nil,
-  UnitNumber = 3
+  MenuIntelObject = nil,
+  MenuConvoyObject = nil,
+  UnitNumber = 3,
+  RequestableIntel = true
 }
 
 function ConvoyService:New()
@@ -54,28 +57,25 @@ function ConvoyService:SetUnitNumber(_unitNumber)
   return self
 end
 
-function ConvoyService:SetStartZones(_startZones, _isPrefix) 
-  if _isPrefix then
-    self.StartZones = ZonesManagerService:GetZonesByPrefix(_startZones)
-    --self.StartZones = { ZonesManagerService:GetRandomZoneByPrefix(_startZones) }
-  else
-    self.StartZones = { ZONE:New(_startZones) }
-  end
+function ConvoyService:SetStartZones(_startZones, _isPrefix)
+  self.StartZones = { Zones = _startZones, isPrefix = _isPrefix } 
   return self
 end
 
-function ConvoyService:SetRandomEndZone(_endZones, _isPrefix) 
-  if _isPrefix then
-    self.EndZone = ZonesManagerService:GetRandomZoneByPrefix(_endZones)
-  else
-    self.EndZone = { ZONE:New(_endZones) }
-  end
+function ConvoyService:SetEndZones(_endZones, _isPrefix) 
+  self.EndZones = { Zones = _endZones, isPrefix = _isPrefix } 
+  
   return self
 end
 
 function ConvoyService:SetMessageOnSpawn(_message)
   self.SendMessageOnSpawn = true
   if _message ~= nil then self.Message = _message end
+  return self
+end
+
+function ConvoyService:SetRequestableIntel(_in)
+  self.RequestableIntel = _in
   return self
 end
 
@@ -127,8 +127,25 @@ end
 
 function ConvoyService:GetSpawnObject()
   local GroundOrgZones = {}
+  local startZones = {}
+  local endZone = {}
   
-  for zoneId, zone in pairs(self.StartZones) do
+  if self.StartZones.isPrefix then
+    startZones = ZonesManagerService:GetZonesByPrefix(self.StartZones.Zones)
+  else
+    for zoneId, zone in pairs(elf.StartZones) do
+      table.insert(startZones, zone)
+    end
+  end
+  
+  if self.EndZones.isPrefix then
+    endZone = ZonesManagerService:GetRandomZoneByPrefix(self.EndZones.Zones)
+  else
+    local randomZone = self.EndZones.Zones[math.random(1, UtilitiesService:Lenght(self.EndZones.Zones))]
+    endZone = ZONE:New(self.EndZones.Zones)
+  end
+  
+  for zoneId, zone in pairs(startZones) do
      table.insert(GroundOrgZones, zone)
   end
   
@@ -148,55 +165,79 @@ function ConvoyService:GetSpawnObject()
     :OnSpawnGroup(
       function(SpawnGroup)
         env.info("Convoy " .. SpawnGroup.GroupName .. " Spawned")
-        SpawnGroup:TaskRouteToZone(self.EndZone,true,150,"On Road")
-        local aaAlert = false;
-        for i,u in pairs(SpawnGroup:GetUnits()) do
-          if u:GetDCSObject():getAttributes()["Air Defence"] ~= nil then
-            aaAlert = true
-          end
-        end
+        SpawnGroup:TaskRouteToZone(endZone,true,150,"On Road")
         
         if self.SendMessageOnSpawn then
-          local vec2Start = SpawnGroup:GetPointVec2()
-          local direction = SpawnGroup:GetPointVec3():GetDirectionVec3(self.EndZone:GetCoordinate())
-          local azimuth = SpawnGroup:GetPointVec3():GetAngleDegrees(direction)
-          local compass_brackets = {"N", "NE", "E", "SE", "S", "SW", "W", "NW", "N"}
-          local compass_lookup = math.floor(azimuth / 45) + 1
-          local compass_direction = compass_brackets[compass_lookup]
-          if compass_direction == nil then compass_direction = "" end
-          azimuth = math.floor(azimuth)
-          if string.len(azimuth) == 2 then azimuth = "0" .. azimuth end
-          if string.len(azimuth) == 1 then azimuth = "00" .. azimuth end
           
-          --local message = "Enemy convoy at " .. vec2Start:ToStringLLDDM(nil) .. " moving to " .. compass_direction .. " Heading (" .. azimuth .. ")"
-          
-          self.Message = self.Message:gsub( "$cordinates", vec2Start:ToStringLLDDM(nil) )
-          self.Message = self.Message:gsub( "$compassDirection", compass_direction )
-          self.Message = self.Message:gsub( "$heading", azimuth )
-          
-          if aaAlert then
-            self.Message = self.Message .. " - Possible anti-aircraft threat in the area"
-          end
-          
-          MESSAGE:New(self.Message, 10):ToBlue()
+          self:SendIntelMessage(SpawnGroup, endZone)
           
           if self.SpawnOnMenuAction then
-           
-            MENU_COALITION_COMMAND:New(self.MenuCoalition, "Delete convoy " .. SpawnGroup.GroupName, self.MenuCoalitionObject, 
+          
+            self.MenuConvoyObject =  MENU_COALITION:New(self.MenuCoalition, SpawnGroup.GroupName, self.MenuCoalitionObject)
+             SpawnGroup:HandleEvent(EVENTS.Dead, function ()
+                if table.getn(SpawnGroup:GetUnits()) == 1 then
+                  self:RemoveMenu(SpawnGroup.GroupName)
+                end 
+              end
+              )
+            
+            if self.RequestableIntel then
+              MENU_COALITION_COMMAND:New(self.MenuCoalition, "Intel",self.MenuConvoyObject, function() self:SendIntelMessage(SpawnGroup, endZone) end)
+            end
+            
+            MENU_COALITION_COMMAND:New(self.MenuCoalition, "Delete convoy", self.MenuConvoyObject, 
               function(removeMenu)
                 SpawnGroup:Destroy(true)
-                env.info("Convoy " .. self.Groups.GroupName .. " Removed")
-                local masterObject = SCHEDULER:New(self.MenuCoalitionObject:GetMenu("Delete convoy " .. SpawnGroup.GroupName))
-                masterObject:Schedule(self.MenuCoalitionObject:GetMenu("Delete convoy " .. SpawnGroup.GroupName),
-                  function (mo, commandMenu) 
-                    commandMenu:Remove()
-                  end
-                , {self.MenuCoalitionObject:GetMenu("Delete convoy " .. SpawnGroup.GroupName)}, .5)
-                env.info("Remove command deleted")
-              end)
+                env.info("Convoy " .. SpawnGroup.GroupName .. " Removed")
+              end
+            )
           end
         end
       end
   )
   return unitSpawn
 end
+
+function ConvoyService:SendIntelMessage(_SpawnGroup, _endZone)
+  local message = "" 
+  local vec2Start = _SpawnGroup:GetPointVec2()
+  local direction = _SpawnGroup:GetPointVec3():GetDirectionVec3(_endZone:GetCoordinate())
+  local azimuth = _SpawnGroup:GetPointVec3():GetAngleDegrees(direction)
+  local compass_brackets = {"N", "NE", "E", "SE", "S", "SW", "W", "NW", "N"}
+  local compass_lookup = math.floor(azimuth / 45) + 1
+  local compass_direction = compass_brackets[compass_lookup]
+  if compass_direction == nil then compass_direction = "" end
+  azimuth = math.floor(azimuth)
+  if string.len(azimuth) == 2 then azimuth = "0" .. azimuth end
+  if string.len(azimuth) == 1 then azimuth = "00" .. azimuth end
+  
+  --local message = "Enemy convoy at " .. vec2Start:ToStringLLDDM(nil) .. " moving to " .. compass_direction .. " Heading (" .. azimuth .. ")"
+  
+  self.Message = self.Message:gsub( "$cordinates", vec2Start:ToStringLLDDM(nil) )
+  self.Message = self.Message:gsub( "$compassDirection", compass_direction )
+  self.Message = self.Message:gsub( "$heading", azimuth )
+  message = self.Message
+  local aaAlert = false;
+  for i,u in pairs(_SpawnGroup:GetUnits()) do
+    if u:GetDCSObject():getAttributes()["Air Defence"] ~= nil then
+      aaAlert = true
+    end
+  end
+        
+  if aaAlert then
+    message = message .. " - Possible anti-aircraft threat in the area"
+  end
+  
+  MESSAGE:New(message, 10):ToCoalition(self.MenuCoalition)
+end
+
+function ConvoyService:RemoveMenu(_menuId) 
+  local masterObject = SCHEDULER:New(self.MenuCoalitionObject:GetMenu(_menuId))
+  masterObject:Schedule(nil,
+    function (commandMenu) 
+      commandMenu:Remove()
+      env.info("Remove command deleted")
+    end
+  , {self.MenuCoalitionObject:GetMenu(_menuId)}, .5)
+end
+

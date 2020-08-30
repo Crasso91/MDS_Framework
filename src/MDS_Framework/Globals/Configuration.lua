@@ -5,28 +5,32 @@ Configuration = {
     Era = 2000,
     TakeoffMode = TakeoffMode.Runway,
     LandMode = LandMode.Runway,
-  Flags = {
-    TacticalDiplay = false, 
-    Dispatchers = {
-      ["BLUE"] = true,
-      ["BLUE_USA"] = true,
-      ["BLUE_USA_AG"] = true,
-      ["BLUE_USA_AG_A10_" .. Mission.BAI] = true,
-      ["BLUE_USA_AG_AH-64D_" .. Mission.BAI] = true,
-      ["BLUE_USA_AG_FA-18C_" .. Mission.SEAD] = true,
-      
-      ["BLUE_USA_AA"] = true,
-      ["BLUE_USA_AA_F-16CM_" .. Mission.CAP] = true,
-      ["BLUE_USA_AA_F-14B_" .. Mission.CAP] = true,
-      
-      ["RED"] = true,
-      ["RED_RUSSIA"] = true,
-      ["RED_RUSSIA_AA"] = true,
-      ["RED_RUSSIA_AA_Su-27_" .. Mission.CAP] = true,
-      ["RED_RUSSIA_AA_MiG-31_" .. Mission.CAP] = true,
-      ["RED_RUSSIA_AA_JF-17_" .. Mission.CAP] = true
+    DatabasePath = "C:\\Users\\danie\\Saved Games\\DCS.openbeta\\databases",
+    Dependecies = {
+      Moose = "E:\\Projects\\GitHub\\MOOSE\\Compiled\\Moose.lua"
+    },
+    Flags = {
+      TacticalDiplay = false, 
+      Dispatchers = {
+        ["BLUE"] = true,
+        ["BLUE_USA"] = true,
+        ["BLUE_USA_AG"] = true,
+        ["BLUE_USA_AG_A10_" .. Mission.BAI] = true,
+        ["BLUE_USA_AG_AH-64D_" .. Mission.BAI] = true,
+        ["BLUE_USA_AG_FA-18C_" .. Mission.SEAD] = true,
+        
+        ["BLUE_USA_AA"] = true,
+        ["BLUE_USA_AA_F-16CM_" .. Mission.CAP] = true,
+        ["BLUE_USA_AA_F-14B_" .. Mission.CAP] = true,
+        
+        ["RED"] = true,
+        ["RED_RUSSIA"] = true,
+        ["RED_RUSSIA_AA"] = true,
+        ["RED_RUSSIA_AA_Su-27_" .. Mission.CAP] = true,
+        ["RED_RUSSIA_AA_MiG-31_" .. Mission.CAP] = true,
+        ["RED_RUSSIA_AA_JF-17_" .. Mission.CAP] = true
+      }
     }
-  }
   }
 }
 
@@ -121,10 +125,10 @@ Configuration.Dispatchers = {
                 ResourceCount = 8,
                 CapLimit = 2,
                 CapGroupCount = 4,
-                LowInterval = 30,
-                HighInterval = 450,
+                LowInterval = 10,
+                HighInterval = 30,
                 Probability = 1,
-                FuelThreshold = 2.5,
+                FuelThreshold = 0.25,
               }
             }
           }, 
@@ -138,13 +142,33 @@ Configuration.Dispatchers = {
                 AttackSpeed = { 450, 2520 },
                 Overhead = 0.5,
                 AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
-                ResourceCount = 8,
+                ResourceCount = 3,
                 CapLimit = 2,
                 CapGroupCount = 4,
-                LowInterval = 30,
-                HighInterval = 450,
+                LowInterval = 10,
+                HighInterval = 30,
                 Probability = 1,
-                FuelThreshold = 2.5,
+                FuelThreshold = 0.25,
+              }
+            }
+          }, 
+          ["F-15C"] = {
+            Airbases = { 
+              { Name = "Airbase_CAP_SEAD", isPrefix = true }  
+            },
+            Missions = {
+              [Mission.GCI] = {
+                AttackAltitude = { 15000 , 25000 },
+                AttackSpeed = { 450, 2650 },
+                Overhead = 0.5,
+                AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
+                ResourceCount = 4,
+                CapLimit = 2,
+                CapGroupCount = 4,
+                LowInterval = 10,
+                HighInterval = 30,
+                Probability = 1,
+                FuelThreshold = 0.25,
               }
             }
           }
@@ -178,13 +202,13 @@ Configuration.Dispatchers = {
                 AttackSpeed = { 450, 2500 },
                 Overhead = 0.25,
                 AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
-                ResourceCount = 6,
+                ResourceCount = 8,
                 CapLimit = 2,
                 CapGroupCount = 2,
-                LowInterval = 30,
-                HighInterval = 600,
+                LowInterval = 10,
+                HighInterval = 30,
                 Probability = 1,
-                FuelThreshold = 2.5,
+                FuelThreshold = 0.25,
               }
             }
           },
@@ -201,10 +225,10 @@ Configuration.Dispatchers = {
                 ResourceCount = 6,
                 CapLimit = 2,
                 CapGroupCount = 2,
-                LowInterval = 30,
-                HighInterval = 600,
+                LowInterval = 10,
+                HighInterval = 30,
                 Probability = 1,
-                FuelThreshold = 2.5,
+                FuelThreshold = 0.25,
               }
             }
           },
@@ -218,13 +242,13 @@ Configuration.Dispatchers = {
                 AttackSpeed = { 450, 3000 },
                 Overhead = 0.25,
                 AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
-                ResourceCount = 6,
+                ResourceCount = 2,
                 CapLimit = 2,
                 CapGroupCount = 2,
-                LowInterval = 30,
-                HighInterval = 600,
+                LowInterval = 10,
+                HighInterval = 30,
                 Probability = 1,
-                FuelThreshold = 2.5,
+                FuelThreshold = 0.25,
               }
             }
           }

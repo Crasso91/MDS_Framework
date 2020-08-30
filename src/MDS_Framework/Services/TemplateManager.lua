@@ -46,10 +46,10 @@ function TemplateManager:InitLazyConovyGroupByFilters(_unitNumber, _coalition, _
     :FilterStart()
     :GetFilterResult()
   
-  local convoy = _templates[math.random(1, table.getn(_templates))]
+  local convoy = routines.utils.deepCopy(UtilitiesService:GetRandomOfUnsequncialTable(_templates))
   convoy.Group.name = convoy.Group.name .. "_Dynamic"
   for i = 2, _unitNumber do
-    local _unit =  routines.utils.deepCopy(_templates[math.random(1, table.getn(_templates))])
+    local _unit =  routines.utils.deepCopy(UtilitiesService:GetRandomOfUnsequncialTable(_templates))
 --    local _unit = routines.utils.deepCopy(_templates[2])
     convoy.Group.units[i] = _unit.Group.units[1]
     convoy.Group.units[i].x = convoy.Group.units[1].x + math.random(1, 1000) + (i * 100)

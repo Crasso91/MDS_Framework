@@ -65,28 +65,28 @@ Configuration = {
     Dependecies = {
       Moose = "E:\\Projects\\GitHub\\MOOSE\\Compiled\\Moose.lua"
     },
-  Flags = {
-    TacticalDiplay = false, 
-    Dispatchers = {
-      ["BLUE"] = true,
-      ["BLUE_USA"] = true,
-      ["BLUE_USA_AG"] = true,
-      ["BLUE_USA_AG_A10_" .. Mission.BAI] = true,
-      ["BLUE_USA_AG_AH-64D_" .. Mission.BAI] = true,
-      ["BLUE_USA_AG_FA-18C_" .. Mission.SEAD] = true,
-      
-      ["BLUE_USA_AA"] = true,
-      ["BLUE_USA_AA_F-16CM_" .. Mission.CAP] = true,
-      ["BLUE_USA_AA_F-14B_" .. Mission.CAP] = true,
-      
-      ["RED"] = true,
-      ["RED_RUSSIA"] = true,
-      ["RED_RUSSIA_AA"] = true,
-      ["RED_RUSSIA_AA_Su-27_" .. Mission.CAP] = true,
-      ["RED_RUSSIA_AA_MiG-31_" .. Mission.CAP] = true,
-      ["RED_RUSSIA_AA_JF-17_" .. Mission.CAP] = true
+    Flags = {
+      TacticalDiplay = false, 
+      Dispatchers = {
+        ["BLUE"] = true,
+        ["BLUE_USA"] = true,
+        ["BLUE_USA_AG"] = true,
+        ["BLUE_USA_AG_A10_" .. Mission.BAI] = true,
+        ["BLUE_USA_AG_AH-64D_" .. Mission.BAI] = true,
+        ["BLUE_USA_AG_FA-18C_" .. Mission.SEAD] = true,
+        
+        ["BLUE_USA_AA"] = true,
+        ["BLUE_USA_AA_F-16CM_" .. Mission.CAP] = true,
+        ["BLUE_USA_AA_F-14B_" .. Mission.CAP] = true,
+        
+        ["RED"] = true,
+        ["RED_RUSSIA"] = true,
+        ["RED_RUSSIA_AA"] = true,
+        ["RED_RUSSIA_AA_Su-27_" .. Mission.CAP] = true,
+        ["RED_RUSSIA_AA_MiG-31_" .. Mission.CAP] = true,
+        ["RED_RUSSIA_AA_JF-17_" .. Mission.CAP] = true
+      }
     }
-  }
   }
 }
 
@@ -365,7 +365,7 @@ end
 
 
 
-UtilitiesService:LoadDependecies()
+--UtilitiesService:LoadDependecies()
 
 
 

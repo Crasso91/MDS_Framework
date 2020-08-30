@@ -33,6 +33,7 @@ Mission = {
   CAS = "CAS",
   BAI = "BAI",
   SEAD = "SEAD",
+  GROUND = "GROUND",
   GCI = "GCI"
 }
 
@@ -43,4 +44,13 @@ Dispatcher = {
   Ground = "Ground",
   GCI = "GCI"
 }
+
+Categories = {
+  AIRPLANE = 0,
+  HELICOPTER = 1,
+  GROUND = 2,
+  SHIP = 3,
+  TRAIN = 4,
+}
+
 

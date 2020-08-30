@@ -25,7 +25,7 @@ function SquadronsOptions:New()
 end
 
 function SquadronsOptions:SetAttackAltitude(_AttackAltitude)
-  self.AttackSpeed = _AttackAltitude
+  self.AttackAltitude = _AttackAltitude
   return self
 end
 
@@ -105,22 +105,27 @@ function SquadronsOptions:SetGroups(_Groups, _arePrefix)
 end
 
 function SquadronsOptions:SetTemplates(_templates)
-  for id, _template in pairs(_templates) do
-    local group = GROUP:NewTemplate(_template.Group, _template.Group.CoalitionID, _template.Group.CategoryID, _template.Group.CountryID)
-    
-    local _templateGroup = SPAWN:New(_template.Group.name)
-      :InitLateActivated(true)
-      :_Prepare( _template.Group.name, math.random(1,10000) )
-      
-    local _templateGroup = SPAWN:NewFromTemplate(_templateGroup, _template.Group.name, _template.Group.name)
-      :InitLateActivated(true)
-      :SpawnFromVec2({x=0,y=0})
-      _DATABASE.GROUPS[_template.Group.name] = nil
-      _DATABASE.Templates.Groups[_template.Group.name] = nil
-    -- = group
-    table.insert(self.Groups, _templateGroup.GroupName)
-  end
-  return self;
+  self.Groups = TemplateManager:New()
+    :InitLazyGroupsByTemplates(_templates)
+    :GetLazyGroupsNames()
+  return self
+
+--  for id, _template in pairs(_templates) do
+--    local group = GROUP:NewTemplate(_template.Group, _template.Group.CoalitionID, _template.Group.CategoryID, _template.Group.CountryID)
+--    
+--    local _templateGroup = SPAWN:New(_template.Group.name)
+--      :InitLateActivated(true)
+--      :_Prepare( _template.Group.name, math.random(1,10000) )
+--      
+--    local _templateGroup = SPAWN:NewFromTemplate(_templateGroup, _template.Group.name, _template.Group.name)
+--      :InitLateActivated(true)
+--      :SpawnFromVec2({x=0,y=0})
+--      _DATABASE.GROUPS[_template.Group.name] = nil
+--      _DATABASE.Templates.Groups[_template.Group.name] = nil
+--    -- = group
+--    table.insert(self.Groups, _templateGroup.GroupName)
+--  end
+--  return self;
 end
 
 function SquadronsOptions:SetAirbases(_Airbases, _arePrefix)
@@ -157,13 +162,6 @@ function SquadronsOptions:SetAirbases(_Airbases, _arePrefix)
 end
 
 function SquadronsOptions:GetRandomAirbase()
-  local count = 0
-  
-  for i,airbase in ipairs(self.Airbases) do
-    count = count + 1
-  end
-  
-  local random = math.random(1,count)
-  
-  return self.Airbases[random]
+  return self.Airbases[math.random(1,UtilitiesService:Lenght(self.Airbases))]
 end
+

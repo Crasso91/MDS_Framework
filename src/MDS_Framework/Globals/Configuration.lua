@@ -5,39 +5,42 @@ Configuration = {
     Era = 2000,
     TakeoffMode = TakeoffMode.Runway,
     LandMode = LandMode.Runway,
-  Flags = {
-    TacticalDiplay = true, 
-    Dispatchers = {
-      Blue_Active = true,
-      Blue_USA_Active = true,
-      Blue_USA_AG_Active = true,
-      Blue_USA_AG_A10_BAI_Active = true,
-      ["Blue_USA_AG_AH-64D_BAI_Active"] = true,
-      ["Blue_USA_AG_AH-A10_BAI_Active"] = true,
-      ["Blue_USA_AG_F-18C_SEAD_Active"] = true,
-      
-      Blue_USA_AA_Active = true,
-      ["Blue_USA_AA_F-16CM_CAP_Active"] = true,
-      
-      Red_Active = true,
-      Red_Russia_Active = true,
-      Red_Russia_GCI_Active = false,
-      Red_Russia_AA_Active = true,
-      ["Red_Russia_AA_Su-27_CAP_Active"] = true,
-      ["Red_Russia_AA_MiG-31_CAP_Active"] = true,
-      ["Red_Russia_AA_JF-17_CAP_Active"] = true
+    DatabasePath = "C:\\Users\\danie\\Saved Games\\DCS.openbeta\\databases",
+    Dependecies = {
+      Moose = "E:\\Projects\\GitHub\\MOOSE\\Compiled\\Moose.lua"
+    },
+    Flags = {
+      TacticalDiplay = false, 
+      Dispatchers = {
+        ["BLUE"] = true,
+        ["BLUE_USA"] = true,
+        ["BLUE_USA_AG"] = true,
+        ["BLUE_USA_AG_A10_" .. Mission.BAI] = true,
+        ["BLUE_USA_AG_AH-64D_" .. Mission.BAI] = true,
+        ["BLUE_USA_AG_FA-18C_" .. Mission.SEAD] = true,
+        
+        ["BLUE_USA_AA"] = true,
+        ["BLUE_USA_AA_F-16CM_" .. Mission.CAP] = true,
+        ["BLUE_USA_AA_F-14B_" .. Mission.CAP] = true,
+        
+        ["RED"] = true,
+        ["RED_RUSSIA"] = true,
+        ["RED_RUSSIA_AA"] = true,
+        ["RED_RUSSIA_AA_Su-27_" .. Mission.CAP] = true,
+        ["RED_RUSSIA_AA_MiG-31_" .. Mission.CAP] = true,
+        ["RED_RUSSIA_AA_JF-17_" .. Mission.CAP] = true
+      }
     }
-  }
   }
 }
 
 Configuration.Dispatchers = {
-    ["Blue"] = {
+    ["BLUE"] = {
     ["USA"] = {
      [1] = {
         CommandCenter = "HQ",
         DetectionArea = 10000,
-        DefenseRadious = 50000,
+        DefenseRadious = 80000,
         Reactivity = Reactivity.High,
         TacticalDisplay = Configuration.Settings.Flags.TacticalDiplay,
         DispatcherType = Dispatcher.AG,
@@ -53,7 +56,7 @@ Configuration.Dispatchers = {
         Units = {
           ["A10"] = {
             Airbases = { 
-              { Name = "BAI_CAS_", isPrefix = true }  
+              { Name = "Airbase_BAI", isPrefix = true }  
             },
             Missions = {
               [Mission.BAI] = {
@@ -62,37 +65,31 @@ Configuration.Dispatchers = {
                 Overhead = 0.10,
                 AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
                 ResourceCount = 4,
-              },
-              [Mission.CAS] = {},
-              [Mission.SEAD] = {}
+              }
             }
           },
           ["AH-64D"] = {
             Airbases = { 
-              { Name = "BAI_CAS_", isPrefix = true }  
+              { Name = "Airbase_BAI_Heli", isPrefix = true }  
             },
             Missions = {
               [Mission.BAI] = {
                 AttackAltitude = { 2000 , 3000 },
                 AttackSpeed = { 360, 450 },
                 Overhead = 0.25,
-                AirbaseResourceMode = AirbaseResourceMode.EveryAirbase,
+                AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
                 ResourceCount = 4,
-              },
-              [Mission.CAS] = {},
-              [Mission.SEAD] = {}
+              }
             }
           },
-          ["F-18C"] = {
+          ["FA-18C"] = {
             Airbases = { 
               { Name = "Airbase_CAP_SEAD", isPrefix = true }  
             },
             Missions = {
-              [Mission.BAI] = {},
-              [Mission.CAS] = {},
               [Mission.SEAD] = {
                 AttackAltitude = { 20000 , 25000 },
-                AttackSpeed = { 360, 450 },
+                AttackSpeed = { 360, 1950 },
                 Overhead = 0.25,
                 AirbaseResourceMode = AirbaseResourceMode.EveryAirbase,
                 ResourceCount = 4,
@@ -110,7 +107,7 @@ Configuration.Dispatchers = {
         TakeoffInterval = 20,
         LandMode = Configuration.Settings.LandMode, 
         --EnemyGroupingRadiuos = 6000,
-        EngageRadius = 80000,
+        EngageRadius = 190000,
         InterceptDelay = 450,
         --GciRadious = 10
         TacticalDisplay = Configuration.Settings.Flags.TacticalDiplay,
@@ -122,16 +119,56 @@ Configuration.Dispatchers = {
             Missions = {
               [Mission.CAP] = {
                 AttackAltitude = { 15000 , 25000 },
-                AttackSpeed = { 800, 1200 },
-                Overhead = 0.25,
+                AttackSpeed = { 450, 1200 },
+                Overhead = 0.5,
                 AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
                 ResourceCount = 8,
                 CapLimit = 2,
-                CapGroupCount = 2,
-                LowInterval = 30,
-                HighInterval = 600,
+                CapGroupCount = 4,
+                LowInterval = 10,
+                HighInterval = 30,
                 Probability = 1,
-                FuelThreshold = 2.5,
+                FuelThreshold = 0.25,
+              }
+            }
+          }, 
+          ["F-14B"] = {
+            Airbases = { 
+              { Name = "Airbase_CAP_SEAD", isPrefix = true }  
+            },
+            Missions = {
+              [Mission.CAP] = {
+                AttackAltitude = { 15000 , 25000 },
+                AttackSpeed = { 450, 2520 },
+                Overhead = 0.5,
+                AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
+                ResourceCount = 3,
+                CapLimit = 2,
+                CapGroupCount = 4,
+                LowInterval = 10,
+                HighInterval = 30,
+                Probability = 1,
+                FuelThreshold = 0.25,
+              }
+            }
+          }, 
+          ["F-15C"] = {
+            Airbases = { 
+              { Name = "Airbase_CAP_SEAD", isPrefix = true }  
+            },
+            Missions = {
+              [Mission.GCI] = {
+                AttackAltitude = { 15000 , 25000 },
+                AttackSpeed = { 450, 2650 },
+                Overhead = 0.5,
+                AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
+                ResourceCount = 4,
+                CapLimit = 2,
+                CapGroupCount = 4,
+                LowInterval = 10,
+                HighInterval = 30,
+                Probability = 1,
+                FuelThreshold = 0.25,
               }
             }
           }
@@ -139,8 +176,8 @@ Configuration.Dispatchers = {
       }
     }
   },
-  ["Red"] = {
-    ["Russia"] = {
+  ["RED"] = {
+    ["RUSSIA"] = {
       [1] = {
         DispatcherType = Dispatcher.AA,
         DetectionGroups = {{ Name = "EWR", isPrefix = true }},
@@ -150,7 +187,7 @@ Configuration.Dispatchers = {
         TakeoffInterval = 20,
         LandMode = Configuration.Settings.LandMode, 
         --EnemyGroupingRadiuos = 6000,
-        EngageRadius = 80000,
+        EngageRadius = 180000,
         InterceptDelay = 450,
         --GciRadious = 10
         TacticalDisplay = Configuration.Settings.Flags.TacticalDiplay,
@@ -161,17 +198,17 @@ Configuration.Dispatchers = {
             },
             Missions = {
               [Mission.CAP] = {
-                AttackAltitude = { 10000 , 20000 },
-                AttackSpeed = { 800, 1200 },
+                AttackAltitude = { 15000 , 25000 },
+                AttackSpeed = { 450, 2500 },
                 Overhead = 0.25,
                 AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
-                ResourceCount = 6,
+                ResourceCount = 8,
                 CapLimit = 2,
                 CapGroupCount = 2,
-                LowInterval = 30,
-                HighInterval = 600,
+                LowInterval = 10,
+                HighInterval = 30,
                 Probability = 1,
-                FuelThreshold = 2.5,
+                FuelThreshold = 0.25,
               }
             }
           },
@@ -181,17 +218,17 @@ Configuration.Dispatchers = {
             },
             Missions = {
               [Mission.CAP] = {
-                AttackAltitude = { 10000 , 20000 },
-                AttackSpeed = { 800, 1200 },
+                AttackAltitude = { 15000 , 25000 },
+                AttackSpeed = { 450, 1200 },
                 Overhead = 0.25,
                 AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
                 ResourceCount = 6,
                 CapLimit = 2,
                 CapGroupCount = 2,
-                LowInterval = 30,
-                HighInterval = 600,
+                LowInterval = 10,
+                HighInterval = 30,
                 Probability = 1,
-                FuelThreshold = 2.5,
+                FuelThreshold = 0.25,
               }
             }
           },
@@ -201,17 +238,17 @@ Configuration.Dispatchers = {
             },
             Missions = {
               [Mission.CAP] = {
-                AttackAltitude = { 10000 , 20000 },
-                AttackSpeed = { 800, 1200 },
+                AttackAltitude = { 15000 , 25000 },
+                AttackSpeed = { 450, 3000 },
                 Overhead = 0.25,
                 AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
-                ResourceCount = 6,
+                ResourceCount = 2,
                 CapLimit = 2,
                 CapGroupCount = 2,
-                LowInterval = 30,
-                HighInterval = 600,
+                LowInterval = 10,
+                HighInterval = 30,
                 Probability = 1,
-                FuelThreshold = 2.5,
+                FuelThreshold = 0.25,
               }
             }
           }

@@ -1195,7 +1195,7 @@ function ConvoyService:GetSpawnObject()
   if self.StartZones.isPrefix then
     startZones = ZonesManagerService:GetZonesByPrefix(self.StartZones.Zones)
   else
-    for zoneId, zone in pairs(elf.StartZones) do
+    for zoneId, zone in pairs(self.StartZones) do
       table.insert(startZones, zone)
     end
   end
@@ -1275,9 +1275,9 @@ function ConvoyService:SendIntelMessage(_SpawnGroup, _endZone)
   
   --local message = "Enemy convoy at " .. vec2Start:ToStringLLDDM(nil) .. " moving to " .. compass_direction .. " Heading (" .. azimuth .. ")"
   
-  self.Message = self.Message:gsub( "$cordinates", vec2Start:ToStringLLDDM(nil) )
-  self.Message = self.Message:gsub( "$compassDirection", compass_direction )
-  self.Message = self.Message:gsub( "$heading", azimuth )
+  message = self.Message:gsub( "$cordinates", vec2Start:ToStringLLDDM(nil) )
+  message = self.Message:gsub( "$compassDirection", compass_direction )
+  message = self.Message:gsub( "$heading", azimuth )
   message = self.Message
   local aaAlert = false;
   for i,u in pairs(_SpawnGroup:GetUnits()) do

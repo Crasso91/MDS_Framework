@@ -54,7 +54,7 @@ function SPAWN:SpawnWithIndex( SpawnIndex, NoBirth )
                 local _previousCoordinate = COORDINATE:NewFromVec2(vec) 
                 local _coordinate = COORDINATE:NewFromVec2(RandomVec2)
                 local _distance = _previousCoordinate:DistanceFromPointVec2(_coordinate)
-                _innerCheck = _innerCheck and _distance > 50
+                _innerCheck = _innerCheck and _distance > self.SpawnInnerRadius
               end
               if _innerCheck then
                 _vec2AssignedPreviously = false

@@ -1222,7 +1222,7 @@ function ConvoyService:GetSpawnObject()
   unitSpawn
     :InitRandomizeRoute( 1, 1, 200 ) 
     :InitRandomizePosition(500, 50)
-    :InitRandomizeUnits(true,500,50)
+    :InitRandomizeUnits(true,50,15)
     :InitRandomizeZones( GroundOrgZones )
     :OnSpawnGroup(
       function(SpawnGroup)
@@ -1274,11 +1274,11 @@ function ConvoyService:SendIntelMessage(_SpawnGroup, _endZone)
   if string.len(azimuth) == 1 then azimuth = "00" .. azimuth end
   
   --local message = "Enemy convoy at " .. vec2Start:ToStringLLDDM(nil) .. " moving to " .. compass_direction .. " Heading (" .. azimuth .. ")"
-  
-  message = self.Message:gsub( "$cordinates", vec2Start:ToStringLLDDM(nil) )
-  message = self.Message:gsub( "$compassDirection", compass_direction )
-  message = self.Message:gsub( "$heading", azimuth )
   message = self.Message
+  message = message:gsub( "$cordinates", vec2Start:ToStringLLDDM(nil) )
+  message = message:gsub( "$compassDirection", compass_direction )
+  message = message:gsub( "$heading", azimuth )
+  
   local aaAlert = false;
   for i,u in pairs(_SpawnGroup:GetUnits()) do
     if u:GetDCSObject():getAttributes()["Air Defence"] ~= nil then
@@ -1740,7 +1740,7 @@ function SPAWN:SpawnWithIndex( SpawnIndex, NoBirth )
                 local _previousCoordinate = COORDINATE:NewFromVec2(vec) 
                 local _coordinate = COORDINATE:NewFromVec2(RandomVec2)
                 local _distance = _previousCoordinate:DistanceFromPointVec2(_coordinate)
-                _innerCheck = _innerCheck and _distance > 50
+                _innerCheck = _innerCheck and _distance > self.SpawnInnerRadius
               end
               if _innerCheck then
                 _vec2AssignedPreviously = false

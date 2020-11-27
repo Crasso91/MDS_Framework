@@ -1,3 +1,11 @@
+Configuration = {
+  FrameworkInit = {
+    DatabasePath = "C:\\Users\\danie\\Saved Games\\DCS.openbeta\\databases",
+    Dependecies = {
+      Moose = "E:\\Projects\\GitHub\\MOOSE\\Compiled\\Moose.lua"
+    }
+  }
+}
 UnitTypeAG = {
   Ground = "Ground",
   Helicopter = "Helicopter",
@@ -29,12 +37,19 @@ AirbaseResourceMode = {
 }
 
 Mission = {
-  CAP = "CAP",
-  CAS = "CAS",
-  BAI = "BAI",
-  SEAD = "SEAD",
-  GROUND = "GROUND",
-  GCI = "GCI"
+  Air = {
+    CAP = "CAP",
+    CAS = "CAS",
+    BAI = "BAI",
+    SEAD = "SEAD",
+    GCI = "GCI"
+  },
+  Ground = {
+    GROUND = "GROUND",
+    ATTACK = "ATTACK",
+    DEFENCE = "DEFENCE",
+    ANTIAIR = "ANTIAIR"    
+  }
 }
 
 Dispatcher = {
@@ -53,322 +68,16 @@ Categories = {
   TRAIN = 4,
 }
 
-
-Configuration = {
-    Settings = {
-    Coalition = "Blue",
-    Nation = "USA",
-    Era = 2000,
-    TakeoffMode = TakeoffMode.Runway,
-    LandMode = LandMode.Runway,
-    DatabasePath = "C:\\Users\\danie\\Saved Games\\DCS.openbeta\\databases",
-    Dependecies = {
-      Moose = "E:\\Projects\\GitHub\\MOOSE\\Compiled\\Moose.lua"
-    },
-    Flags = {
-      TacticalDiplay = false, 
-      Dispatchers = {
-        ["BLUE"] = true,
-        ["BLUE_USA"] = true,
-        ["BLUE_USA_AG"] = true,
-        ["BLUE_USA_AG_A10_" .. Mission.BAI] = true,
-        ["BLUE_USA_AG_AH-64D_" .. Mission.BAI] = true,
-        ["BLUE_USA_AG_FA-18C_" .. Mission.SEAD] = true,
-        
-        ["BLUE_USA_AA"] = true,
-        ["BLUE_USA_AA_F-16CM_" .. Mission.CAP] = true,
-        ["BLUE_USA_AA_F-14B_" .. Mission.CAP] = true,
-        
-        ["RED"] = true,
-        ["RED_RUSSIA"] = true,
-        ["RED_RUSSIA_AA"] = true,
-        ["RED_RUSSIA_AA_Su-27_" .. Mission.CAP] = true,
-        ["RED_RUSSIA_AA_MiG-31_" .. Mission.CAP] = true,
-        ["RED_RUSSIA_AA_JF-17_" .. Mission.CAP] = true
-      }
-    }
-  }
-}
-
-Configuration.Dispatchers = {
-    ["BLUE"] = {
-    ["USA"] = {
-     [1] = {
-        CommandCenter = "HQ",
-        DetectionArea = 10000,
-        DefenseRadious = 80000,
-        Reactivity = Reactivity.High,
-        TacticalDisplay = Configuration.Settings.Flags.TacticalDiplay,
-        DispatcherType = Dispatcher.AG,
-        TakeoffMode = Configuration.Settings.TakeoffMode,
-        TakeoffInterval = 20,
-        LandMode = Configuration.Settings.LandMode, 
-        DetectionGroups = { 
-          { Name = "Detection", isPrefix = true }
-        },
-        DefenceCoordinates = {
-          { Name = "Defence", isPrefix = true }
-        },
-        Units = {
-          ["A10"] = {
-            Airbases = { 
-              { Name = "Airbase_BAI", isPrefix = true }  
-            },
-            Missions = {
-              [Mission.BAI] = {
-                AttackAltitude = { 2000 , 3000 },
-                AttackSpeed = { 360, 450 },
-                Overhead = 0.10,
-                AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
-                ResourceCount = 4,
-              }
-            }
-          },
-          ["AH-64D"] = {
-            Airbases = { 
-              { Name = "Airbase_BAI_Heli", isPrefix = true }  
-            },
-            Missions = {
-              [Mission.BAI] = {
-                AttackAltitude = { 2000 , 3000 },
-                AttackSpeed = { 360, 450 },
-                Overhead = 0.25,
-                AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
-                ResourceCount = 4,
-              }
-            }
-          },
-          ["FA-18C"] = {
-            Airbases = { 
-              { Name = "Airbase_CAP_SEAD", isPrefix = true }  
-            },
-            Missions = {
-              [Mission.SEAD] = {
-                AttackAltitude = { 20000 , 25000 },
-                AttackSpeed = { 360, 1950 },
-                Overhead = 0.25,
-                AirbaseResourceMode = AirbaseResourceMode.EveryAirbase,
-                ResourceCount = 4,
-              }
-            }
-          }
-        }
-      },
-      [2] = {
-        DispatcherType = Dispatcher.AA,
-        DetectionGroups = {{ Name = "EWR", isPrefix = true }},
-        CAPZones = {{ Name = "CAP", isPrefix = true }}, 
-        --SimultaneousMaxCAP = 2,
-        TakeoffMode = Configuration.Settings.TakeoffMode,
-        TakeoffInterval = 20,
-        LandMode = Configuration.Settings.LandMode, 
-        --EnemyGroupingRadiuos = 6000,
-        EngageRadius = 190000,
-        InterceptDelay = 450,
-        --GciRadious = 10
-        TacticalDisplay = Configuration.Settings.Flags.TacticalDiplay,
-        Units = { 
-          ["F-16CM"] = {
-            Airbases = { 
-              { Name = "Airbase_CAP_SEAD", isPrefix = true }  
-            },
-            Missions = {
-              [Mission.CAP] = {
-                AttackAltitude = { 15000 , 25000 },
-                AttackSpeed = { 450, 1200 },
-                Overhead = 0.5,
-                AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
-                ResourceCount = 8,
-                CapLimit = 2,
-                CapGroupCount = 4,
-                LowInterval = 10,
-                HighInterval = 30,
-                Probability = 1,
-                FuelThreshold = 0.25,
-              }
-            }
-          }, 
-          ["F-14B"] = {
-            Airbases = { 
-              { Name = "Airbase_CAP_SEAD", isPrefix = true }  
-            },
-            Missions = {
-              [Mission.CAP] = {
-                AttackAltitude = { 15000 , 25000 },
-                AttackSpeed = { 450, 2520 },
-                Overhead = 0.5,
-                AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
-                ResourceCount = 3,
-                CapLimit = 2,
-                CapGroupCount = 4,
-                LowInterval = 10,
-                HighInterval = 30,
-                Probability = 1,
-                FuelThreshold = 0.25,
-              }
-            }
-          }, 
-          ["F-15C"] = {
-            Airbases = { 
-              { Name = "Airbase_CAP_SEAD", isPrefix = true }  
-            },
-            Missions = {
-              [Mission.GCI] = {
-                AttackAltitude = { 15000 , 25000 },
-                AttackSpeed = { 450, 2650 },
-                Overhead = 0.5,
-                AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
-                ResourceCount = 4,
-                CapLimit = 2,
-                CapGroupCount = 4,
-                LowInterval = 10,
-                HighInterval = 30,
-                Probability = 1,
-                FuelThreshold = 0.25,
-              }
-            }
-          }
-        }
-      }
-    }
+Predicate = {
+  Action = {
+    MarkCoalition = "a_mark_coalition"
   },
-  ["RED"] = {
-    ["RUSSIA"] = {
-      [1] = {
-        DispatcherType = Dispatcher.AA,
-        DetectionGroups = {{ Name = "EWR", isPrefix = true }},
-        CAPZones = {{ Name = "CAP", isPrefix = true }}, 
-        --SimultaneousMaxCAP = 2,
-        TakeoffMode = Configuration.Settings.TakeoffMode,
-        TakeoffInterval = 20,
-        LandMode = Configuration.Settings.LandMode, 
-        --EnemyGroupingRadiuos = 6000,
-        EngageRadius = 180000,
-        InterceptDelay = 450,
-        --GciRadious = 10
-        TacticalDisplay = Configuration.Settings.Flags.TacticalDiplay,
-        Units = { 
-          ["Su-27"] = {
-            Airbases = { 
-              { Name = "Airbase_CAP", isPrefix = true }  
-            },
-            Missions = {
-              [Mission.CAP] = {
-                AttackAltitude = { 15000 , 25000 },
-                AttackSpeed = { 450, 2500 },
-                Overhead = 0.25,
-                AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
-                ResourceCount = 8,
-                CapLimit = 2,
-                CapGroupCount = 2,
-                LowInterval = 10,
-                HighInterval = 30,
-                Probability = 1,
-                FuelThreshold = 0.25,
-              }
-            }
-          },
-          ["MiG-31"] = {
-            Airbases = { 
-              { Name = "Airbase_CAP", isPrefix = true }  
-            },
-            Missions = {
-              [Mission.CAP] = {
-                AttackAltitude = { 15000 , 25000 },
-                AttackSpeed = { 450, 1200 },
-                Overhead = 0.25,
-                AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
-                ResourceCount = 6,
-                CapLimit = 2,
-                CapGroupCount = 2,
-                LowInterval = 10,
-                HighInterval = 30,
-                Probability = 1,
-                FuelThreshold = 0.25,
-              }
-            }
-          },
-          ["JF-17"] = {
-            Airbases = { 
-              { Name = "Airbase_CAP", isPrefix = true }  
-            },
-            Missions = {
-              [Mission.CAP] = {
-                AttackAltitude = { 15000 , 25000 },
-                AttackSpeed = { 450, 3000 },
-                Overhead = 0.25,
-                AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
-                ResourceCount = 2,
-                CapLimit = 2,
-                CapGroupCount = 2,
-                LowInterval = 10,
-                HighInterval = 30,
-                Probability = 1,
-                FuelThreshold = 0.25,
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-UtilitiesService = {
-	ClassName = "UtilitiesService"
-}
-
-function UtilitiesService:ArrayHasValue (tab, val)
-    for index, value in ipairs(tab) do
-        if value == val then
-            return true
-        end
-    end
-
-    return false
-end
-
-function UtilitiesService:GetEnumKeyByValue(_enum, _id) 
-  for k,v in pairs(_enum) do
-    if k == _id then return v end 
-  end
-  return nil
-end
-
-function UtilitiesService:GetRandomOfUnsequncialTable(_table)
-  local _random = math.random(1, UtilitiesService:Lenght(_table))
-  local _count = 1
+  Condition = {
+    UnitInZone = "c_unit_in_zone"
+  },
+  TriggerOnce = "triggerOnce"
   
-  for i,row in pairs(_table) do
-    if _count == _random then
-      return row
-    else
-      _count = _count + 1
-    end
-  end
-  return nil
-end
-
-function UtilitiesService:Lenght(_table)
-  local count = 0
-  for k,v in pairs(_table) do
-    count = count + 1
-  end    
-  return count
-end
-
-function UtilitiesService:LoadDependecies() 
-  for k,v in pairs(Configuration.Settings.Dependecies) do
-    assert(loadfile(v))()
-  end
-end
-
-
-
---UtilitiesService:LoadDependecies()
-
-
-
+}
 A2GDispatcherOptions = {
   ClassName = "A2GDispatcherOptions",
   __index = A2GDispatcherOptions,
@@ -421,7 +130,7 @@ function A2GDispatcherOptions:SetDetectionGroups(_Groups, _arePrefix)
     local foundedGroups = {}
     for groupId, groupName in ipairs(_Groups) do
       --table.insert(foundedGroups, GROUP:FindByName(group))
-      local group = GROUP:FindByName(group)
+      local group = GROUP:FindByName(groupName)
       foundedGroups[groupName] = group
     end
     self.DetectionGroups = foundedGroups
@@ -549,7 +258,7 @@ SquadronsOptions = {
   Airbases = {},
   ResourceCount = 5,
   AirbaseResourceMode = AirbaseResourceMode.EveryAirbase,
-  Missions = { Mission.CAP },
+  Missions = { Mission.Air.CAP },
   CapLimit = 2,
   LowInterval = 30,
   HighInterval = 600,
@@ -703,6 +412,451 @@ function SquadronsOptions:GetRandomAirbase()
   return self.Airbases[math.random(1,UtilitiesService:Lenght(self.Airbases))]
 end
 
+AI_G2G_Dispatcher = {
+    ClassName = "AI_G2G_Dispatcher",
+    Coalition = nil,
+    EnemyCoalition = nil,
+    Faction = nil,
+    HQ = nil,
+    Detection = {},
+    DefenceZonesNames = {},
+    DefenceZones = {},
+    MissionGroupsNames = {},
+    MissionGroups = {},
+    OverHead = 0.5,
+    RunningMissons = {},
+    ReinforceGroups = {},
+    ReinforceGroupsNames = {},
+    IntegratedDispatcher = {},
+    Reactivity = Reactivity.High,
+    SimultaneuslyMissions = 2,
+    MissionScheduleTime = 30,
+    _FSM = FSM:New(),
+    ActiveMissions = {}
+}
+
+function AI_G2G_Dispatcher:New(_detection) 
+  local self = BASE:Inherit( self, DETECTION_MANAGER:New( nil, _detection ) ) -- #AI_G2G_DISPATCHER
+  self.Detection = _detection
+  --Setting default defence zone on detection zones
+--  for k,v in pairs(_detection:GetDetectionSet()) do
+--      table.insert(self.DefenceZones, v:GetVec3())
+--  end
+  
+  return self
+end
+
+function AI_G2G_Dispatcher:SetHQ(_hqName)  
+  local _hq = GROUP:FindByName(_hqName)
+  
+  if _hq == nil then
+    self:T("HQ group not found")
+  end
+  
+  self.HQ = _hq
+  return self
+end
+
+function AI_G2G_Dispatcher:SetCoalition(_in) 
+  self.Coalition = _in
+  return self
+end
+
+function AI_G2G_Dispatcher:SetFaction(_in)
+  self.Faction = _in
+  return self
+end
+
+function AI_G2G_Dispatcher:SetOverhead(_in)
+  self.OverHead = _in
+  return self
+end
+
+function AI_G2G_Dispatcher:AddDefenceZone(_zones, _isPrefix)
+  if _zones ~= table then
+    _zones = { _zones }
+  end
+  local object = { List = _zones, IsPrefix = _isPrefix}
+  table.insert(self.DefenceZonesNames, object)
+
+  return self
+end
+
+function AI_G2G_Dispatcher:AddMissionGroup(_group, _mission, _isPrefix)
+  if _group ~= table then
+    _group = { _group }
+  end
+  local object = { List = _group, Mission = _mission, IsPrefix = _isPrefix}
+  table.insert(self.MissionGroupsNames, object)
+  return self
+end
+
+function AI_G2G_Dispatcher:AddMissionGroupFromTemplate(_category, _mission, _unitType)
+  local group = TemplateManager:InitLazyGroupsByFilters(self.Coalition, self.Faction, _category, _mission, _unitType)
+    :GetLazyGroupsNames()
+    
+  local object = { List = group, Mission = _mission, IsPrefix = false}
+  table.insert(self.MissionGroupsNames, object)
+  return self
+end
+
+function AI_G2G_Dispatcher:AddReinforceGroup(_group, _mission, _isPrefix)
+  if _group ~= table then
+    _group = { _group }
+  end
+  local object = { List = _group, Mission = _mission, IsPrefix = _isPrefix}
+  table.insert(self.ReinforceGroupsNames, object)
+  return self
+end
+
+function AI_G2G_Dispatcher:SetReactivity(_reactivity)
+  if _reactivity == nil then
+    self:T("Reactiviy is nil")
+    return self
+  end
+  self.reactivity = _reactivity
+  return self
+end
+
+function AI_G2G_Dispatcher:SetSimultaneuslyMissions(_in)
+  if _in == nil then
+    self:T("integer input is nil")
+    return self
+  end
+  
+  self.SimultaneuslyMissions = _in
+  return  self
+end
+
+function AI_G2G_Dispatcher:SetMissionScheduledTime(_in)
+  if _in == nil then
+    self:T("Missione schedule time is nil")
+    return self
+  end
+  
+  self.MissionScheduleTime = _in
+  return self
+end
+
+function AI_G2G_Dispatcher:AddDispatcherIntegration(_dispatcherType, _dispatcher)
+  if _dispatcherType == nil then
+    self:T("Provided disaptcherType is nil")
+    return self
+  end
+  if _dispatcher == nil then
+    self:T("Provided disaptcher si nil")
+    return self
+  end
+  
+  table.insert(self.IntegratedDispatcher, { Type = _dispatcherType, Dispatcher = _dispatcher })
+  return self
+end
+
+function AI_G2G_Dispatcher:_InitZones()
+  for k,v in pairs(self.DefenceZonesNames) do
+    local zones = nil
+      for i,z in pairs(v.List) do
+        if v.IsPrefix then
+          local set_zone = SET_ZONE:New()
+            :FilterPrefixes(z)
+            :FilterStop()
+            .Set
+          table.inset(self.DefenceZones, set_zone)
+        else
+          table.insert(self.DefenceZones, ZONE:New(z))
+        end
+    end
+  end
+end
+
+function AI_G2G_Dispatcher:_InitMissionGroups()
+  for k,v in pairs(self.MissionGroupsNames) do
+    local zones = nil
+      for i,z in pairs(v.List) do
+        if v.IsPrefix then
+          local set_zone = SET_GROUP:New()
+            :FilterPrefixes(z)
+            :FilterStop()
+            .Set
+          table.inset(self.MissionGroups, set_zone)
+        else
+          table.insert(self.MissionGroups, GROUP:FindByName(z))
+        end
+    end
+  end
+end
+
+function AI_G2G_Dispatcher:_InitReinforceGroups()
+  for k,v in pairs(self.ReinforceGroupsNames) do
+    local zones = nil
+      for i,z in pairs(v.List) do
+        if v.IsPrefix then
+          local set_zone = SET_GROUP:New()
+            :FilterPrefixes(z)
+            :FilterStop()
+            .Set
+          table.inset(self.ReinforceGroups, set_zone)
+        else
+          table.insert(self.ReinforceGroups, GROUP:FindByName(z))
+        end
+    end
+  end
+end
+ 
+function AI_G2G_Dispatcher:Init()
+
+  if self.Coalition == nil and self.HQ ~= nil then
+    self.Coalition = self.HQ:GetCoalition() 
+  end
+  
+  if self.Faction == nil and self.HQ ~= nil then
+    self.Faction = self.HQ:GetCountry()
+  end
+  
+  if self.Coalition == coalition.side.BLUE then
+    self.EnemyCoalition = coalition.side.RED
+  else
+    self.EnemyCoalition = coalition.side.BLUE
+  end
+  
+  self:_InitZones()
+  self:_InitMissionGroups()
+  self:_InitReinforceGroups()
+    
+  --for i,zone in pairs(self.DefenceZones) do
+    --zone:HandleEvent(EVENTS.MarkChange, function(EventData) self:OnMarkChange(EventData) end)
+  --end
+  
+  local enemies = SET_GROUP:New()
+    :FilterCategoryGround()
+    :FilterStart()
+    .Set
+    
+    for i,zone in pairs(self.DefenceZones) do
+    self._FSM:AddTransition(zone.ZoneName.."_ZoneBlue", "Switch", zone.ZoneName.."_ZoneRed")
+    self._FSM:AddTransition(zone.ZoneName.."_ZoneRed", "Switch", zone.ZoneName.."_ZoneBlue")
+     for eId,enemy in pairs(enemies) do
+      SCHEDULER:New(nil, function(_zone) 
+        local enemiesInZone = enemy:IsCompletelyInZone(_zone)
+        
+        if enemiesInZone then
+          self._FSM:__Switch(5, self, _zone)
+          self:SendReinforceIfNecessary("ZoneRed",_zone)
+        end
+      end, { zone }, 30, 30)
+--      for uId, unit in pairs(enemy:GetUnits()) do
+        
+--        SCHEDULER:New(nil, function(_zone, _enemy)
+--          local enemiesInZone = _enemy:IsPartlyOrCompletelyInZone(_zone)
+--          local friendlyGroups = SET_GROUP:New()
+--            :FilterCoalition
+--        
+--        end, { zone, enemy })
+--        Trigger:New()
+--          :SetUnitName(unit.UnitName)
+--          :SetTriggerName(zone.ZoneName)
+--          :SetCoalition(self.EnemyCoalition)
+--          :SetActivationMeter(zone.Zone.radius)
+--          :SetActionPredicate(Predicate.Action.MarkCoalition)
+--          :SetConditionPredicate(Predicate.Condition.UnitInZone)
+--          :_Prepare()
+--          :AddToMission()
+      end
+--    end
+   end
+end
+
+function AI_G2G_Dispatcher._FSM:OnAfterSwitch(from, event, to, _self, _zone)
+  self:SendReinforceIfNecessary(to,_zone)
+end
+
+function AI_G2G_Dispatcher:SendReinforceIfNecessary(to, _zone)
+  if to == "ZoneRed" and not self:ExistsActiveMission(_zone) then
+    local enemyGroups = SET_UNIT:New()
+      :FilterCoalitions(string.lower(UtilitiesService:GetEnumKeyByValue(coalition.side, self.EnemyCoalition)))
+      :FilterCategories("ground")
+      :FilterStart()
+    
+    local friendlyGroups = SET_UNIT:New()
+      :FilterCoalitions(string.lower(UtilitiesService:GetEnumKeyByValue(coalition.side, self.Coalition)))
+      :FilterCategories("ground")
+      :FilterStart()
+    
+     local aliveEnemies = 0
+     local aliveFriendlies = 0
+     enemyGroups:ForEachUnitCompletelyInZone(_zone, function() aliveEnemies = aliveEnemies + 1 end) 
+     friendlyGroups:ForEachUnitCompletelyInZone(_zone, function() aliveFriendlies = aliveFriendlies + 1 end)
+   
+   
+   
+    if aliveEnemies > (aliveFriendlies * self.OverHead) then  
+      local reinfGroup = UtilitiesService:GetRandomOfUnsequncialTable(self.ReinforceGroups)
+      self:StartMissionAttack(reinfGroup, _zone, aliveEnemies)
+    end
+  end
+end
+
+function AI_G2G_Dispatcher:StartMissionAttack(_group, _attackZone, aliveEnemies)
+  SPAWN:New(_group.GroupName)
+    :InitLimit(aliveEnemies * self.OverHead, 1)
+    :InitRandomizeRoute( 1, 1, 200 ) 
+    :InitRandomizePosition(500, 50)
+    :InitRandomizeZones( { ZONE_GROUP:New("Zone_" .. self.HQ.GroupName, self.HQ, 200) } )
+    :OnSpawnGroup( function (_spawnedGroup)
+      _spawnedGroup:TaskRouteToZone(_attackZone,true,150,"On Road")
+    end)
+    :SpawnScheduled(5, .5)
+    
+  self.ActiveMissions["AttackMisson_"..timer:getAbsTime()] = {
+    Group = _group,
+    DestinationZone = _attackZone
+  }
+end
+
+function AI_G2G_Dispatcher:ExistsActiveMission(_attackZone)
+  for k,v in pairs(self.ActiveMissions) do 
+    if v.DestinationZone.ZoneName == _attackZone.ZoneName then
+      return true
+    end
+  end
+  return false
+end
+
+Trigger = {
+  trigrules = {
+    action = {
+        KeyDict_comment = "DynamicTrigger_$unitName_$triggerName_comment",
+        KeyDict_text = "DynamicTrigger_$unitName_$triggerName_text",
+        coalitionlist = "",
+        comment = "DynamicTrigger_$unitName_$triggerName_comment",
+        meters = 0,
+        predicate = Predicate.Action.MarkCoalition,
+        readonly = false,
+        text = "DynamicTrigger_$unitName_$triggerName_text",
+        value = 10,
+        zone = 0,
+    },
+    rule = {
+        _max = 0,
+        _min = 0,
+        argument = 0,
+        predicate = Predicate.Condition.UnitInZone,
+        unit = 0,
+        zone = 0
+    },
+  },
+  trig = {
+    action = [[$trigrules.action.predicate($trigrules.action.value, getValueDictByKey(\"$trigrules.action.KeyDict_text\"), $trigrules.action.zone, \"$trigrules.action.coalitionlist\", $trigrules.action.readonly, getValueDictByKey(\"$trigrules.action.KeyDict_comment\")); mission.trig.func[$index]=nil;]],
+    condition = "return($trigrules.rule.predicate($trigrules.rule.unit, $trigrules.rule.zone) )",
+    func = "if mission.trig.conditions[$index]() then mission.trig.actions[$index]() end"
+  },
+  UnitName = "",
+  TriggerName = "",
+  TriggerIndex = 999
+}
+
+function Trigger:New()
+ self = routines.utils.deepCopy(Trigger)
+ return self
+end
+
+function Trigger:SetUnitName(_unitName)
+  self.UnitName = _unitName
+  return self
+end
+
+function Trigger:SetTriggerName(_triggerName)
+  self.TriggerName = _triggerName
+  return self
+end
+
+function Trigger:SetCoalition(_coalition)
+  local unitCoalition = UNIT:FindByName(self.UnitName):GetGroup():GetCoalition()
+  self.trigrules.action.coalitionlist = string.lower(UtilitiesService:GetEnumKeyByValue(coalition.side, unitCoalition))
+  return self
+end
+
+function Trigger:SetActivationMeter(_meters)
+  self.trigrules.action.meters = _meters 
+  return self
+end
+
+function Trigger:SetActionPredicate(_predicate)
+  self.trigrules.action.predicate = _predicate
+  return self
+end
+
+function Trigger:SetConditionPredicate(_predicate)
+  self.trigrules.rule.predicate = _predicate
+  return self
+end
+
+function Trigger:_Prepare() 
+  self.TriggerIndex = UtilitiesService:Lenght(env.mission.trig.actions) + 1
+  local unitID = UNIT:FindByName(self.UnitName):GetID()
+  local triggerID = nil
+  for i,t in pairs(env.mission.triggers.zones) do
+    if t.name == self.TriggerName then
+      triggerID = t.zoneId
+      break
+    end
+  end
+  
+  self.trigrules.action.KeyDict_comment = self.trigrules.action.KeyDict_comment:gsub("$unitName", self.UnitName)
+  self.trigrules.action.KeyDict_comment = self.trigrules.action.KeyDict_comment:gsub("$triggerName", self.TriggerName)
+  self.trigrules.action.KeyDict_text = self.trigrules.action.KeyDict_text:gsub("$unitName", self.UnitName)
+  self.trigrules.action.KeyDict_text = self.trigrules.action.KeyDict_text:gsub("$triggerName", self.TriggerName)
+  self.trigrules.action.comment = self.trigrules.action.comment:gsub("$unitName", self.UnitName)
+  self.trigrules.action.comment = self.trigrules.action.comment:gsub("$triggerName", self.TriggerName)
+  self.trigrules.action.text = self.trigrules.action.text:gsub("$unitName", self.UnitName)
+  self.trigrules.action.text = self.trigrules.action.text:gsub("$triggerName", self.TriggerName)
+  
+  self.trigrules.action.zone = triggerID
+  self.trigrules.rule.zone = triggerID
+  self.trigrules.rule.unit = unitID
+  
+  self.trig.action = self.trig.action:gsub("$trigrules.action.predicate",self.trigrules.action.predicate)
+  self.trig.action = self.trig.action:gsub("$trigrules.action.value",self.trigrules.action.value)
+  self.trig.action = self.trig.action:gsub("$trigrules.action.KeyDict_text",self.trigrules.action.KeyDict_text)
+  self.trig.action = self.trig.action:gsub("$trigrules.action.zone",self.trigrules.action.zone)
+  self.trig.action = self.trig.action:gsub("$trigrules.action.coalitionlist",self.trigrules.action.coalitionlist)
+  self.trig.action = self.trig.action:gsub("$trigrules.action.readonly", tostring(self.trigrules.action.readonly))
+  self.trig.action = self.trig.action:gsub("$trigrules.action.KeyDict_comment",self.trigrules.action.KeyDict_comment)
+  self.trig.action = self.trig.action:gsub("$index", self.TriggerIndex)
+  
+  
+  self.trig.condition = self.trig.condition:gsub("$trigrules.rule.predicate",self.trigrules.rule.predicate)
+  self.trig.condition = self.trig.condition:gsub("$trigrules.rule.unit",self.trigrules.rule.unit)
+  self.trig.condition = self.trig.condition:gsub("$trigrules.rule.zone", self.trigrules.rule.zone)
+  
+  
+  self.trig.func = self.trig.func:gsub("$index", self.TriggerIndex)
+  self.Prepared = true
+  return self  
+end
+
+function Trigger:AddToMission()
+  if not self.Prepared then
+    self:_Prepare()
+  end  
+  
+  env.mission.trig.actions[self.TriggerIndex] = self.trig.action
+  env.mission.trig.conditions[self.TriggerIndex] = self.trig.condition
+  env.mission.trig.flag[self.TriggerIndex] = true
+  env.mission.trig.func[self.TriggerIndex] = self.trig.func
+  
+  env.mission.trigrules[self.TriggerIndex] = {}
+  env.mission.trigrules[self.TriggerIndex].actions= {}
+  env.mission.trigrules[self.TriggerIndex].rules = {}
+  
+  env.mission.trigrules[self.TriggerIndex].actions[1] = self.trigrules.action
+  env.mission.trigrules[self.TriggerIndex].comment = self.trigrules.action.text
+  env.mission.trigrules[self.TriggerIndex].predicate = Predicate.TriggerOnce
+  env.mission.trigrules[self.TriggerIndex].rules[1] = self.trigrules.rule
+end
+
+
+
 A2GDispatcherInitializator = {
   ClassName = "A2GDispatcherInitializator",
   DispatcherOptions = nil,
@@ -776,11 +930,11 @@ end
 
 function A2GDispatcherInitializator:SetSquadronMission(_squadronName, _option, _A2GDispatcher)
 --  for i , mission in ipairs(_option.Missions) do
-    if _option.Missions == Mission.BAI then
+    if _option.Missions == Mission.Air.BAI then
       _A2GDispatcher:SetSquadronBai( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2], _option.AttackAltitude[1], _option.AttackAltitude[2])
-    elseif _option.Missions == Mission.CAS then
+    elseif _option.Missions == Mission.Air.CAS then
       _A2GDispatcher:SetSquadronCas( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2], _option.AttackAltitude[1], _option.AttackAltitude[2])
-    elseif _option.Missions == Mission.SEAD then
+    elseif _option.Missions == Mission.Air.SEAD then
       _A2GDispatcher:SetSquadronSead( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2], _option.AttackAltitude[1], _option.AttackAltitude[2])
     else 
 --      _A2GDispatcher:SetSquadronCas( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2], _option.AttackAltitude[1], _option.AttackAltitude[2])
@@ -904,16 +1058,16 @@ end
 
 function A2ADispatcherInitializator:SetSquadronMission(_squadronName, _CAPZone, _option, _A2ADispatcher)
 --  for i , mission in ipairs(_option.Missions) do
-    if _option.Missions == Mission.CAP then
+    if _option.Missions == Mission.Air.CAP then
       local CAPZone = ZONE_POLYGON:New( "CAP" .. _squadronName, _CAPZone)
       _A2ADispatcher:SetSquadronCap( _squadronName, CAPZone, _option.AttackAltitude[1], _option.AttackAltitude[2], _option.AttackSpeed[1], _option.AttackSpeed[2])
       _A2ADispatcher:SetSquadronCapInterval(_squadronName, _option.CapLimit, _option.LowInterval, _option.HighInterval, _option.Probability)
       _A2ADispatcher:SetSquadronGrouping( _squadronName, _option.CapGroupCount )
 --      _A2ADispatcher:SetSquadronGci( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2])
       _A2ADispatcher:SetSquadronFuelThreshold(_squadronName, _option.FuelThreshold)
-    elseif _option.Missions == Mission.Gci then
+    elseif _option.Missions == Mission.Air.Gci then
       _A2ADispatcher:SetSquadronGci( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2])--, _option.AttackAltitude[1], _option.AttackAltitude[2])
-    elseif _option.Missions == Mission.SEAD then
+    elseif _option.Missions == Mission.Air.SEAD then
       _A2ADispatcher:SetSquadronSead( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2], _option.AttackAltitude[1], _option.AttackAltitude[2])
     else 
 --      _A2ADispatcher:SetSquadronCas( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2], _option.AttackAltitude[1], _option.AttackAltitude[2])
@@ -1149,8 +1303,7 @@ end
 function ConvoyService:InitGroupByFilters()
   if table.getn(self.Groups) ~= 0 then return self.Groups  end
   self.Groups = TemplateManager:New()
-    --:InitLazyGroupsByFilters(self.Coalition, self.Faction, self.Category, Mission.GROUND, self.GroupType)
-    :InitLazyConovyGroupByFilters(self.UnitNumber, self.Coalition, self.Faction, self.Category, Mission.GROUND, self.GroupType)
+    :InitLazyConovyGroupByFilters(self.UnitNumber, self.Coalition, self.Faction, self.Category, Mission.Air.GROUND, self.GroupType)
     :GetLazyGroupsNames()
 end
 
@@ -1618,7 +1771,7 @@ function DispatchersProvider:InitAGSquadronOption(_coalition, faction,  _dispatc
     for missionId, mission in pairs(unit.Missions) do
       if  Configuration.Settings.Flags.Dispatchers[_coalition .. "_" .. faction .. "_" .. _dispatcherType .. "_" .. unitId .. "_" .. missionId]  then
         local templates = MDSDatabase:New()
-          :FilterCoalition(UtilitiesService:GetEnumKeyByValue(coalition.side,_coalition))
+          :FilterCoalition(coalition.side[_coalition])
           :FilterFactions({ country.name[faction] })
           :FilterUnitNames({ unitId })
           :FilterMissions({ missionId })
@@ -1655,7 +1808,7 @@ function DispatchersProvider:InitAASquadronOption(_coalition, faction, _dispatch
   for missionId, mission in pairs(unit.Missions) do
     if  Configuration.Settings.Flags.Dispatchers[_coalition .. "_" .. faction .. "_" .. _dispatcherType .. "_" .. unitId .. "_" .. missionId]  then
       local templates = MDSDatabase:New()
-          :FilterCoalition(UtilitiesService:GetEnumKeyByValue(coalition.side,_coalition))
+          :FilterCoalition(coalition.side[_coalition])
           :FilterFactions({ country.name[faction] })
           :FilterUnitNames({ unitId })
           :FilterMissions({ missionId })
@@ -1684,7 +1837,11 @@ function DispatchersProvider:InitAASquadronOption(_coalition, faction, _dispatch
     end
   --end
   return nil
-end--- Will spawn a group with a specified index number.
+end----OVERRIDES
+
+
+
+--- Will spawn a group with a specified index number.
 -- Method overrided to chek coordinates assigned to previous units to prevent overlapping
 -- Uses @{DATABASE} global object defined in MOOSE.
 -- @param #SPAWN self
@@ -1923,3 +2080,312 @@ function SPAWN:SpawnWithIndex( SpawnIndex, NoBirth )
 
   return nil
 end
+Configuration.Settings = {
+  Coalition = "Blue",
+  Nation = "USA",
+  Era = 2000,
+  TakeoffMode = TakeoffMode.Runway,
+  LandMode = LandMode.Runway,
+  Flags = {
+    Dispatchers = {
+      TacticalDiplay = false, 
+      
+      ["BLUE"] = true,
+      ["BLUE_USA"] = true,
+      ["BLUE_USA_AG"] = true,
+      ["BLUE_USA_AG_A10_" .. Mission.Air.BAI] = true,
+      ["BLUE_USA_AG_AH-64D_" .. Mission.Air.BAI] = true,
+      ["BLUE_USA_AG_FA-18C_" .. Mission.Air.SEAD] = true,
+      
+      ["BLUE_USA_AA"] = true,
+      ["BLUE_USA_AA_F-16CM_" .. Mission.Air.CAP] = true,
+      ["BLUE_USA_AA_F-14B_" .. Mission.Air.CAP] = true,
+      
+      ["RED"] = true,
+      ["RED_RUSSIA"] = true,
+      ["RED_RUSSIA_AA"] = true,
+      ["RED_RUSSIA_AA_Su-27_" .. Mission.Air.CAP] = true,
+      ["RED_RUSSIA_AA_MiG-31_" .. Mission.Air.CAP] = true,
+      ["RED_RUSSIA_AA_JF-17_" .. Mission.Air.CAP] = true
+    }
+  }
+}
+
+Configuration.Dispatchers = {
+    ["BLUE"] = {
+    ["USA"] = {
+     [1] = {
+        CommandCenter = "HQ",
+        DetectionArea = 10000,
+        DefenseRadious = 80000,
+        Reactivity = Reactivity.High,
+        TacticalDisplay = Configuration.Settings.Flags.Dispatchers.TacticalDisplay,
+        DispatcherType = Dispatcher.AG,
+        TakeoffMode = Configuration.Settings.TakeoffMode,
+        TakeoffInterval = 20,
+        LandMode = Configuration.Settings.LandMode, 
+        DetectionGroups = { 
+          { Name = "Detection", isPrefix = true }
+        },
+        DefenceCoordinates = {
+          { Name = "Defence", isPrefix = true }
+        },
+        Units = {
+          ["A10"] = {
+            Airbases = { 
+              { Name = "Airbase_BAI", isPrefix = true }  
+            },
+            Missions = {
+              [Mission.Air.BAI] = {
+                AttackAltitude = { 2000 , 3000 },
+                AttackSpeed = { 360, 450 },
+                Overhead = 0.10,
+                AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
+                ResourceCount = 4,
+              }
+            }
+          },
+          ["AH-64D"] = {
+            Airbases = { 
+              { Name = "Airbase_BAI_Heli", isPrefix = true }  
+            },
+            Missions = {
+              [Mission.Air.BAI] = {
+                AttackAltitude = { 2000 , 3000 },
+                AttackSpeed = { 360, 450 },
+                Overhead = 0.25,
+                AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
+                ResourceCount = 4,
+              }
+            }
+          },
+          ["FA-18C"] = {
+            Airbases = { 
+              { Name = "Airbase_CAP_SEAD", isPrefix = true }  
+            },
+            Missions = {
+              [Mission.Air.SEAD] = {
+                AttackAltitude = { 20000 , 25000 },
+                AttackSpeed = { 360, 1950 },
+                Overhead = 0.25,
+                AirbaseResourceMode = AirbaseResourceMode.EveryAirbase,
+                ResourceCount = 4,
+              }
+            }
+          }
+        }
+      },
+      [2] = {
+        DispatcherType = Dispatcher.AA,
+        DetectionGroups = {{ Name = "EWR", isPrefix = true }},
+        CAPZones = {{ Name = "CAP", isPrefix = true }}, 
+        --SimultaneousMaxCAP = 2,
+        TakeoffMode = Configuration.Settings.TakeoffMode,
+        TakeoffInterval = 20,
+        LandMode = Configuration.Settings.LandMode, 
+        --EnemyGroupingRadiuos = 6000,
+        EngageRadius = 190000,
+        InterceptDelay = 450,
+        --GciRadious = 10
+        TacticalDisplay = Configuration.Settings.Flags.Dispatchers.TacticalDisplay,
+        Units = { 
+          ["F-16CM"] = {
+            Airbases = { 
+              { Name = "Airbase_CAP_SEAD", isPrefix = true }  
+            },
+            Missions = {
+              [Mission.Air.CAP] = {
+                AttackAltitude = { 15000 , 25000 },
+                AttackSpeed = { 450, 1200 },
+                Overhead = 0.5,
+                AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
+                ResourceCount = 8,
+                CapLimit = 2,
+                CapGroupCount = 4,
+                LowInterval = 10,
+                HighInterval = 30,
+                Probability = 1,
+                FuelThreshold = 0.25,
+              }
+            }
+          }, 
+          ["F-14B"] = {
+            Airbases = { 
+              { Name = "Airbase_CAP_SEAD", isPrefix = true }  
+            },
+            Missions = {
+              [Mission.Air.CAP] = {
+                AttackAltitude = { 15000 , 25000 },
+                AttackSpeed = { 450, 2520 },
+                Overhead = 0.5,
+                AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
+                ResourceCount = 3,
+                CapLimit = 2,
+                CapGroupCount = 4,
+                LowInterval = 10,
+                HighInterval = 30,
+                Probability = 1,
+                FuelThreshold = 0.25,
+              }
+            }
+          }, 
+          ["F-15C"] = {
+            Airbases = { 
+              { Name = "Airbase_CAP_SEAD", isPrefix = true }  
+            },
+            Missions = {
+              [Mission.Air.GCI] = {
+                AttackAltitude = { 15000 , 25000 },
+                AttackSpeed = { 450, 2650 },
+                Overhead = 0.5,
+                AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
+                ResourceCount = 4,
+                CapLimit = 2,
+                CapGroupCount = 4,
+                LowInterval = 10,
+                HighInterval = 30,
+                Probability = 1,
+                FuelThreshold = 0.25,
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  ["RED"] = {
+    ["RUSSIA"] = {
+      [1] = {
+        DispatcherType = Dispatcher.AA,
+        DetectionGroups = {{ Name = "EWR", isPrefix = true }},
+        CAPZones = {{ Name = "CAP", isPrefix = true }}, 
+        --SimultaneousMaxCAP = 2,
+        TakeoffMode = Configuration.Settings.TakeoffMode,
+        TakeoffInterval = 20,
+        LandMode = Configuration.Settings.LandMode, 
+        --EnemyGroupingRadiuos = 6000,
+        EngageRadius = 180000,
+        InterceptDelay = 450,
+        --GciRadious = 10
+        TacticalDisplay = Configuration.Settings.Flags.Dispatchers.TacticalDisplay,
+        Units = { 
+          ["Su-27"] = {
+            Airbases = { 
+              { Name = "Airbase_CAP", isPrefix = true }  
+            },
+            Missions = {
+              [Mission.Air.CAP] = {
+                AttackAltitude = { 15000 , 25000 },
+                AttackSpeed = { 450, 2500 },
+                Overhead = 0.25,
+                AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
+                ResourceCount = 8,
+                CapLimit = 2,
+                CapGroupCount = 2,
+                LowInterval = 10,
+                HighInterval = 30,
+                Probability = 1,
+                FuelThreshold = 0.25,
+              }
+            }
+          },
+          ["MiG-31"] = {
+            Airbases = { 
+              { Name = "Airbase_CAP", isPrefix = true }  
+            },
+            Missions = {
+              [Mission.Air.CAP] = {
+                AttackAltitude = { 15000 , 25000 },
+                AttackSpeed = { 450, 1200 },
+                Overhead = 0.25,
+                AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
+                ResourceCount = 6,
+                CapLimit = 2,
+                CapGroupCount = 2,
+                LowInterval = 10,
+                HighInterval = 30,
+                Probability = 1,
+                FuelThreshold = 0.25,
+              }
+            }
+          },
+          ["JF-17"] = {
+            Airbases = { 
+              { Name = "Airbase_CAP", isPrefix = true }  
+            },
+            Missions = {
+              [Mission.Air.CAP] = {
+                AttackAltitude = { 15000 , 25000 },
+                AttackSpeed = { 450, 3000 },
+                Overhead = 0.25,
+                AirbaseResourceMode = AirbaseResourceMode.RandomAirbase,
+                ResourceCount = 2,
+                CapLimit = 2,
+                CapGroupCount = 2,
+                LowInterval = 10,
+                HighInterval = 30,
+                Probability = 1,
+                FuelThreshold = 0.25,
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+UtilitiesService = {
+	ClassName = "UtilitiesService"
+}
+
+function UtilitiesService:ArrayHasValue (tab, val)
+    for index, value in ipairs(tab) do
+        if value == val then
+            return true
+        end
+    end
+
+    return false
+end
+
+function UtilitiesService:GetEnumKeyByValue(_enum, _id) 
+  for k,v in pairs(_enum) do
+    if v == _id then return k end 
+  end
+  return nil
+end
+
+function UtilitiesService:GetRandomOfUnsequncialTable(_table)
+  local _random = math.random(1, UtilitiesService:Lenght(_table))
+  local _count = 1
+  
+  for i,row in pairs(_table) do
+    if _count == _random then
+      return row
+    else
+      _count = _count + 1
+    end
+  end
+  return nil
+end
+
+function UtilitiesService:Lenght(_table)
+  local count = 0
+  for k,v in pairs(_table) do
+    count = count + 1
+  end    
+  return count
+end
+
+function UtilitiesService:LoadDependecies() 
+  for k,v in pairs(Configuration.FrameworkInit.Dependecies) do
+    assert(loadfile(v))()
+  end
+end
+
+
+
+--UtilitiesService:LoadDependecies()
+
+

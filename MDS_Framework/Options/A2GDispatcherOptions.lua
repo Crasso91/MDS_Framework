@@ -51,7 +51,7 @@ function A2GDispatcherOptions:SetDetectionGroups(_Groups, _arePrefix)
     local foundedGroups = {}
     for groupId, groupName in ipairs(_Groups) do
       --table.insert(foundedGroups, GROUP:FindByName(group))
-      local group = GROUP:FindByName(group)
+      local group = GROUP:FindByName(groupName)
       foundedGroups[groupName] = group
     end
     self.DetectionGroups = foundedGroups

@@ -101,7 +101,7 @@ function DispatchersProvider:InitAGSquadronOption(_coalition, faction,  _dispatc
     for missionId, mission in pairs(unit.Missions) do
       if  Configuration.Settings.Flags.Dispatchers[_coalition .. "_" .. faction .. "_" .. _dispatcherType .. "_" .. unitId .. "_" .. missionId]  then
         local templates = MDSDatabase:New()
-          :FilterCoalition(UtilitiesService:GetEnumKeyByValue(coalition.side,_coalition))
+          :FilterCoalition(coalition.side[_coalition])
           :FilterFactions({ country.name[faction] })
           :FilterUnitNames({ unitId })
           :FilterMissions({ missionId })
@@ -138,7 +138,7 @@ function DispatchersProvider:InitAASquadronOption(_coalition, faction, _dispatch
   for missionId, mission in pairs(unit.Missions) do
     if  Configuration.Settings.Flags.Dispatchers[_coalition .. "_" .. faction .. "_" .. _dispatcherType .. "_" .. unitId .. "_" .. missionId]  then
       local templates = MDSDatabase:New()
-          :FilterCoalition(UtilitiesService:GetEnumKeyByValue(coalition.side,_coalition))
+          :FilterCoalition(coalition.side[_coalition])
           :FilterFactions({ country.name[faction] })
           :FilterUnitNames({ unitId })
           :FilterMissions({ missionId })

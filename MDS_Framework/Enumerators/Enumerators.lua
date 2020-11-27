@@ -34,6 +34,7 @@ Mission = {
     CAS = "CAS",
     BAI = "BAI",
     SEAD = "SEAD",
+    GCI = "GCI"
   },
   Ground = {
     GROUND = "GROUND",
@@ -59,4 +60,13 @@ Categories = {
   TRAIN = 4,
 }
 
-
+Predicate = {
+  Action = {
+    MarkCoalition = "a_mark_coalition"
+  },
+  Condition = {
+    UnitInZone = "c_unit_in_zone"
+  },
+  TriggerOnce = "triggerOnce"
+  
+}

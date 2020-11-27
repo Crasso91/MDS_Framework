@@ -87,8 +87,7 @@ end
 function ConvoyService:InitGroupByFilters()
   if table.getn(self.Groups) ~= 0 then return self.Groups  end
   self.Groups = TemplateManager:New()
-    --:InitLazyGroupsByFilters(self.Coalition, self.Faction, self.Category, Mission.GROUND, self.GroupType)
-    :InitLazyConovyGroupByFilters(self.UnitNumber, self.Coalition, self.Faction, self.Category, Mission.GROUND, self.GroupType)
+    :InitLazyConovyGroupByFilters(self.UnitNumber, self.Coalition, self.Faction, self.Category, Mission.Air.GROUND, self.GroupType)
     :GetLazyGroupsNames()
 end
 

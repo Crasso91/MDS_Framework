@@ -14,7 +14,7 @@ end
 
 function UtilitiesService:GetEnumKeyByValue(_enum, _id) 
   for k,v in pairs(_enum) do
-    if k == _id then return v end 
+    if v == _id then return k end 
   end
   return nil
 end
@@ -42,7 +42,7 @@ function UtilitiesService:Lenght(_table)
 end
 
 function UtilitiesService:LoadDependecies() 
-  for k,v in pairs(Configuration.Settings.Dependecies) do
+  for k,v in pairs(Configuration.FrameworkInit.Dependecies) do
     assert(loadfile(v))()
   end
 end

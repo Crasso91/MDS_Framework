@@ -87,16 +87,16 @@ end
 
 function A2ADispatcherInitializator:SetSquadronMission(_squadronName, _CAPZone, _option, _A2ADispatcher)
 --  for i , mission in ipairs(_option.Missions) do
-    if _option.Missions == Mission.CAP then
+    if _option.Missions == Mission.Air.CAP then
       local CAPZone = ZONE_POLYGON:New( "CAP" .. _squadronName, _CAPZone)
       _A2ADispatcher:SetSquadronCap( _squadronName, CAPZone, _option.AttackAltitude[1], _option.AttackAltitude[2], _option.AttackSpeed[1], _option.AttackSpeed[2])
       _A2ADispatcher:SetSquadronCapInterval(_squadronName, _option.CapLimit, _option.LowInterval, _option.HighInterval, _option.Probability)
       _A2ADispatcher:SetSquadronGrouping( _squadronName, _option.CapGroupCount )
 --      _A2ADispatcher:SetSquadronGci( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2])
       _A2ADispatcher:SetSquadronFuelThreshold(_squadronName, _option.FuelThreshold)
-    elseif _option.Missions == Mission.Gci then
+    elseif _option.Missions == Mission.Air.Gci then
       _A2ADispatcher:SetSquadronGci( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2])--, _option.AttackAltitude[1], _option.AttackAltitude[2])
-    elseif _option.Missions == Mission.SEAD then
+    elseif _option.Missions == Mission.Air.SEAD then
       _A2ADispatcher:SetSquadronSead( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2], _option.AttackAltitude[1], _option.AttackAltitude[2])
     else 
 --      _A2ADispatcher:SetSquadronCas( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2], _option.AttackAltitude[1], _option.AttackAltitude[2])

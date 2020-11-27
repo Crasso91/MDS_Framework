@@ -1,32 +1,30 @@
-Configuration = {
-    Settings = {
-    Coalition = "Blue",
-    Nation = "USA",
-    Era = 2000,
-    TakeoffMode = TakeoffMode.Runway,
-    LandMode = LandMode.Runway,
-    Flags = {
-      Dispatchers = {
-        TacticalDiplay = false, 
-        
-        ["BLUE"] = true,
-        ["BLUE_USA"] = true,
-        ["BLUE_USA_AG"] = true,
-        ["BLUE_USA_AG_A10_" .. Mission.BAI] = true,
-        ["BLUE_USA_AG_AH-64D_" .. Mission.BAI] = true,
-        ["BLUE_USA_AG_FA-18C_" .. Mission.SEAD] = true,
-        
-        ["BLUE_USA_AA"] = true,
-        ["BLUE_USA_AA_F-16CM_" .. Mission.CAP] = true,
-        ["BLUE_USA_AA_F-14B_" .. Mission.CAP] = true,
-        
-        ["RED"] = true,
-        ["RED_RUSSIA"] = true,
-        ["RED_RUSSIA_AA"] = true,
-        ["RED_RUSSIA_AA_Su-27_" .. Mission.CAP] = true,
-        ["RED_RUSSIA_AA_MiG-31_" .. Mission.CAP] = true,
-        ["RED_RUSSIA_AA_JF-17_" .. Mission.CAP] = true
-      }
+Configuration.Settings = {
+  Coalition = "Blue",
+  Nation = "USA",
+  Era = 2000,
+  TakeoffMode = TakeoffMode.Runway,
+  LandMode = LandMode.Runway,
+  Flags = {
+    Dispatchers = {
+      TacticalDiplay = false, 
+      
+      ["BLUE"] = true,
+      ["BLUE_USA"] = true,
+      ["BLUE_USA_AG"] = true,
+      ["BLUE_USA_AG_A10_" .. Mission.Air.BAI] = true,
+      ["BLUE_USA_AG_AH-64D_" .. Mission.Air.BAI] = true,
+      ["BLUE_USA_AG_FA-18C_" .. Mission.Air.SEAD] = true,
+      
+      ["BLUE_USA_AA"] = true,
+      ["BLUE_USA_AA_F-16CM_" .. Mission.Air.CAP] = true,
+      ["BLUE_USA_AA_F-14B_" .. Mission.Air.CAP] = true,
+      
+      ["RED"] = true,
+      ["RED_RUSSIA"] = true,
+      ["RED_RUSSIA_AA"] = true,
+      ["RED_RUSSIA_AA_Su-27_" .. Mission.Air.CAP] = true,
+      ["RED_RUSSIA_AA_MiG-31_" .. Mission.Air.CAP] = true,
+      ["RED_RUSSIA_AA_JF-17_" .. Mission.Air.CAP] = true
     }
   }
 }
@@ -56,7 +54,7 @@ Configuration.Dispatchers = {
               { Name = "Airbase_BAI", isPrefix = true }  
             },
             Missions = {
-              [Mission.BAI] = {
+              [Mission.Air.BAI] = {
                 AttackAltitude = { 2000 , 3000 },
                 AttackSpeed = { 360, 450 },
                 Overhead = 0.10,
@@ -70,7 +68,7 @@ Configuration.Dispatchers = {
               { Name = "Airbase_BAI_Heli", isPrefix = true }  
             },
             Missions = {
-              [Mission.BAI] = {
+              [Mission.Air.BAI] = {
                 AttackAltitude = { 2000 , 3000 },
                 AttackSpeed = { 360, 450 },
                 Overhead = 0.25,
@@ -84,7 +82,7 @@ Configuration.Dispatchers = {
               { Name = "Airbase_CAP_SEAD", isPrefix = true }  
             },
             Missions = {
-              [Mission.SEAD] = {
+              [Mission.Air.SEAD] = {
                 AttackAltitude = { 20000 , 25000 },
                 AttackSpeed = { 360, 1950 },
                 Overhead = 0.25,
@@ -114,7 +112,7 @@ Configuration.Dispatchers = {
               { Name = "Airbase_CAP_SEAD", isPrefix = true }  
             },
             Missions = {
-              [Mission.CAP] = {
+              [Mission.Air.CAP] = {
                 AttackAltitude = { 15000 , 25000 },
                 AttackSpeed = { 450, 1200 },
                 Overhead = 0.5,
@@ -134,7 +132,7 @@ Configuration.Dispatchers = {
               { Name = "Airbase_CAP_SEAD", isPrefix = true }  
             },
             Missions = {
-              [Mission.CAP] = {
+              [Mission.Air.CAP] = {
                 AttackAltitude = { 15000 , 25000 },
                 AttackSpeed = { 450, 2520 },
                 Overhead = 0.5,
@@ -154,7 +152,7 @@ Configuration.Dispatchers = {
               { Name = "Airbase_CAP_SEAD", isPrefix = true }  
             },
             Missions = {
-              [Mission.GCI] = {
+              [Mission.Air.GCI] = {
                 AttackAltitude = { 15000 , 25000 },
                 AttackSpeed = { 450, 2650 },
                 Overhead = 0.5,
@@ -194,7 +192,7 @@ Configuration.Dispatchers = {
               { Name = "Airbase_CAP", isPrefix = true }  
             },
             Missions = {
-              [Mission.CAP] = {
+              [Mission.Air.CAP] = {
                 AttackAltitude = { 15000 , 25000 },
                 AttackSpeed = { 450, 2500 },
                 Overhead = 0.25,
@@ -214,7 +212,7 @@ Configuration.Dispatchers = {
               { Name = "Airbase_CAP", isPrefix = true }  
             },
             Missions = {
-              [Mission.CAP] = {
+              [Mission.Air.CAP] = {
                 AttackAltitude = { 15000 , 25000 },
                 AttackSpeed = { 450, 1200 },
                 Overhead = 0.25,
@@ -234,7 +232,7 @@ Configuration.Dispatchers = {
               { Name = "Airbase_CAP", isPrefix = true }  
             },
             Missions = {
-              [Mission.CAP] = {
+              [Mission.Air.CAP] = {
                 AttackAltitude = { 15000 , 25000 },
                 AttackSpeed = { 450, 3000 },
                 Overhead = 0.25,

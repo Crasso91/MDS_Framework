@@ -71,11 +71,11 @@ end
 
 function A2GDispatcherInitializator:SetSquadronMission(_squadronName, _option, _A2GDispatcher)
 --  for i , mission in ipairs(_option.Missions) do
-    if _option.Missions == Mission.BAI then
+    if _option.Missions == Mission.Air.BAI then
       _A2GDispatcher:SetSquadronBai( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2], _option.AttackAltitude[1], _option.AttackAltitude[2])
-    elseif _option.Missions == Mission.CAS then
+    elseif _option.Missions == Mission.Air.CAS then
       _A2GDispatcher:SetSquadronCas( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2], _option.AttackAltitude[1], _option.AttackAltitude[2])
-    elseif _option.Missions == Mission.SEAD then
+    elseif _option.Missions == Mission.Air.SEAD then
       _A2GDispatcher:SetSquadronSead( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2], _option.AttackAltitude[1], _option.AttackAltitude[2])
     else 
 --      _A2GDispatcher:SetSquadronCas( _squadronName, _option.AttackSpeed[1], _option.AttackSpeed[2], _option.AttackAltitude[1], _option.AttackAltitude[2])
